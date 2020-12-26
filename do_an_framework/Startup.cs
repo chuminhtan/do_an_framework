@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using do_an_framework.Models;
 
 namespace do_an_framework
 {
@@ -23,6 +24,8 @@ namespace do_an_framework
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
+            services.AddTransient<MySqlDatabase>(_ => new MySqlDatabase("server=localhost; database=cake_db; uid=root; pwd=;"));
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
