@@ -102,4 +102,23 @@
       
         <!-- end card body -->
     </div>
+    </div>
  
+@section script{ 
+    <script>
+        // Hiển thị ảnh upload
+        let image_input_DOM = document.querySelector("#user_image");
+        image_input_DOM.addEventListener("input", () => {
+            let reader = new FileReader();
+            let output = document.querySelector("#output");
+
+            reader.onload = (e) => {
+                console.log(e.target);
+                console.log(output);
+                output.src = e.target.result;
+            };
+
+            reader.readAsDataURL(image_input_DOM.files[0]);
+        });
+    </script>
+} 

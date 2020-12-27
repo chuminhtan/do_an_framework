@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Http
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -93,13 +96,34 @@
     <!-- Page level custom scripts -->
     <!-- <script src="admin-assets/js/demo/chart-area-demo.js"></script>
     <script src="admin-assets/js/demo/chart-pie-demo.js"></script> -->
-
     <!-- Script tự viết -->
     @RenderSection("script", required: false)
 
-    <script>
-		// Kiểm tra kết quả xử lý
-    </script>
+<script>
+
+    // Kiểm tra kết quả xử lý
+    const result = "@Html.Raw(HttpContextAccessor.HttpContext.Session.GetString("result"))";
+    const message = "@Html.Raw(HttpContextAccessor.HttpContext.Session.GetString("message"))";
+
+    if (result == "success") {
+        Swal.fire({
+            title: 'Thành Công',
+            text: message,
+            icon: 'success',
+            showConfirmButton: false,
+            timer: 1300
+        })
+
+    } else if (result == "fail") {
+                    Swal.fire({
+                title: 'Thất Bại',
+                text: message,
+                icon: 'error',
+                showConfirmButton: true,
+                    })
+
+    }
+</script>
 </body>
 
 </html>
