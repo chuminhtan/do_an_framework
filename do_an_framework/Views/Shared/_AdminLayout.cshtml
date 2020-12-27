@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Http
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -96,10 +99,12 @@
     <!-- Script tự viết -->
     @RenderSection("script", required: false)
 
-    <script>
-	// Kiểm tra kết quả xử lý
-    const result = @ViewData["result"];
-    const message = @ViewData["message"];
+<script>
+
+    // Kiểm tra kết quả xử lý
+    const result = "@Html.Raw(HttpContextAccessor.HttpContext.Session.GetString("result"))";
+    const message = "@Html.Raw(HttpContextAccessor.HttpContext.Session.GetString("message"))";
+
     if (result == "success") {
         Swal.fire({
             title: 'Thành Công',
@@ -108,15 +113,17 @@
             showConfirmButton: false,
             timer: 1300
         })
+
     } else if (result == "fail") {
                     Swal.fire({
                 title: 'Thất Bại',
                 text: message,
                 icon: 'error',
                 showConfirmButton: true,
-            })
+                    })
+
     }
-    </script>
+</script>
 </body>
 
 </html>

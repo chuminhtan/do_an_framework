@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using do_an_framework.Models;
+using Microsoft.AspNetCore.Http;
 
 namespace do_an_framework
 {
@@ -28,11 +29,12 @@ namespace do_an_framework
 
             services.AddTransient<MySqlDatabase>(_ => new MySqlDatabase("server=localhost; database=cake_db; uid=root; pwd=;"));
 
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
             services.AddDistributedMemoryCache();           // Đăng ký dịch vụ lưu cache trong bộ nhớ (Session sẽ sử dụng nó)
             
-            services.AddSession(cfg => {                    // Đăng ký dịch vụ Session
-                cfg.Cookie.Name = "adminCookie";             // Đặt tên Session - tên này sử dụng ở Browser (Cookie)
-                cfg.IdleTimeout = new TimeSpan(0, 900, 0);    // Thời gian tồn tại của Session
+            services.AddSession(options => {                    // Đăng ký dịch vụ Session
+                options.IdleTimeout = new TimeSpan(0, 900, 0);    // Thời gian tồn tại của Session
             });
 
         }
@@ -48,7 +50,7 @@ namespace do_an_framework
             {
                 app.UseExceptionHandler("/Home/Error");
             }
-
+            app.UseSession();
             app.UseStaticFiles();
 
             app.UseRouting();
@@ -65,7 +67,7 @@ namespace do_an_framework
                     pattern: "admin/{controller}/{action=Index}/{id?}");
             });
 
-            app.UseSession();
+            
         }
     }
 }

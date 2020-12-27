@@ -105,7 +105,6 @@ namespace do_an_framework.Controllers
                 }
             }
 
-
             var cmd = this.MySqlDatabase.Connection.CreateCommand() as MySqlCommand;
 
              cmd.CommandText = @"INSERT INTO nguoi_dung(ten_nguoi_dung, dien_thoai, loai, email, mat_khau, anh_nguoi_dung) VALUES (@user_name, @user_phone, @user_permission, @user_email, @user_password, @user_image);";
@@ -121,13 +120,13 @@ namespace do_an_framework.Controllers
 
             if (recs == 1)
             {
-                ViewData["result"] = "success";
-                ViewData["message"] = "Đã tạo tài khoản";
+                HttpContext.Session.SetString("result", "success");
+                HttpContext.Session.SetString("message", "Đã tạo tài khoản");
             }
             else
             {
-                ViewData["result"] = "fail";
-                ViewData["message"] = "Lỗi";
+                HttpContext.Session.SetString("result", "fail");
+                HttpContext.Session.SetString("message", "Lỗi");
             }
             return Redirect("/admin/user/index");
         }
