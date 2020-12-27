@@ -23,7 +23,7 @@ namespace do_an_framework.Controllers
         {
             var productlist = new List<ProductModel>();
             var cmd = this.MySqlDatabase.Connection.CreateCommand() as MySqlCommand;
-            cmd.CommandText = @"Select*from danh_muc";
+            cmd.CommandText = @"Select ma_san_pham, ten_san_pham, mo_ta_san_pham, gia, tinh_trang, phan_loai, anh_san_pham, ma_danh_muc, thoi_gian_tao from san_pham";
             
             using (var reader = await cmd.ExecuteReaderAsync())
                 while (await reader.ReadAsync())
