@@ -1,3 +1,4 @@
 /.vs
 /do_an_framework/bin
 /do_an_framework/obj
+/do_an_framework/*.user

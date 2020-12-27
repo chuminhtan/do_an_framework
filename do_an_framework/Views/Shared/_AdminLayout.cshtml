@@ -114,15 +114,22 @@
             timer: 1300
         })
 
+    @{
+        HttpContextAccessor.HttpContext.Session.Remove("result");
+    }
+
     } else if (result == "fail") {
-                    Swal.fire({
+            Swal.fire({
                 title: 'Thất Bại',
                 text: message,
                 icon: 'error',
                 showConfirmButton: true,
-                    })
-
+             })
+       @{
+        HttpContextAccessor.HttpContext.Session.Remove("result");
     }
+    }
+
 </script>
 </body>
 

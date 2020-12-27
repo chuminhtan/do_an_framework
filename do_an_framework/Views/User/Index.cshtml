@@ -42,31 +42,31 @@
                         @if (Model != null)
                         {
                             int i = 1;
-                            foreach (var t in Model)
+                            foreach (var user in Model)
                             {
                         <tr>
 
                             <td>@i</td>
-                            <td><p>@t.user_id</p></td>
+                            <td><p>@user.user_id</p></td>
                             <td>
-                                <image src="/images/user/@t.user_image" alt="img" width="80">
+                                <image src="/images/user/@user.user_image" alt="img" width="80">
                             </td>
-                            <td><p>@t.user_name</p></td>
-                            <td><p>@t.user_phone</p></td>
-                            <td><p>@t.user_email</p></td>
+                            <td><p>@user.user_name</p></td>
+                            <td><p>@user.user_phone</p></td>
+                            <td><p>@user.user_email</p></td>
                             <td>
-                                @if (t.user_type == 0) {
+                                @if (user.user_type == 1) {
                                 <span class="text-white bg-secondary p-1">Nhân Viên</span>
                                 } else {
                                 <span class="text-white bg-success p-1">Quản Trị</span>
                                 }
                             </td>
-                            <td><p>@t.user_created_at</p></td>
+                            <td><p>@user.user_created_at</p></td>
                             <td>
-                                <a href="/admin/user/info/@t.user_id" class="btn btn-info btn-sm">
+                                <a href="/admin/user/info/@user.user_id" class="btn btn-info btn-sm">
                                     <i class="fas fa-info-circle"></i>
                                 </a>
-                                <a href="/admin/user/delete/@t.user_id"
+                                <a href="/admin/user/delete/@user.user_id"
                                    class="btn btn-danger btn-circle btn-sm btn-delete"
                                    onclick="return confirmDelete(this)">
                                     <i class=" fas fa-trash"></i>
@@ -100,6 +100,7 @@
                 cancelButtonText: 'Hủy'
             }).then((result) => {
                 if (result.isConfirmed) {
+                    alert(btnDelete.href);
                     location.assign(btnDelete.href)
                 }
                 return false
