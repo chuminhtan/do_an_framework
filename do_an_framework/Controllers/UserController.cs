@@ -156,7 +156,7 @@ namespace do_an_framework.Controllers
         /**
          * Delete User
          */
-         public async Task<IActionResult> Delete (int id)
+         public IActionResult Delete (int id)
         {
             int userId = id;
 
@@ -199,7 +199,7 @@ namespace do_an_framework.Controllers
             if (recs == 1)
             {
                 HttpContext.Session.SetString("result", "success");
-                HttpContext.Session.SetString("message", "Đã tạo tài khoản");
+                HttpContext.Session.SetString("message", "Đã xóa tài khoản");
             }
             else
             {

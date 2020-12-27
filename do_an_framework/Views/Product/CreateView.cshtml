@@ -66,7 +66,9 @@
                         <label for="product_category" class="col-md-3 col-form-label">Danh mục</label>
                         <div class="col-sm-8">
                             <select class="form-control" name="product_category" id="product_category">             
-                                <option value="1" class="font-weight-bold">Mặc Định</option>
+                                @foreach (var category in Model) { 
+                            <option value="@category.id" class="font-weight-bold">@category.name</option>
+                                }
                             </select>
                         </div>
                     </div>
@@ -77,7 +79,7 @@
                         <div class="col-sm-8">
                             <input type="file" name="product_image" class="form-control mb-3 p-1" accept="image/*"
                                    id="product_image" required>
-                            <img id="output" src="" width="300"
+                            <img id="output" src="/images/default.png" width="300"
                                  style="border:2px solid #000; border-radius: 5px;" />
                         </div>
                     </div>

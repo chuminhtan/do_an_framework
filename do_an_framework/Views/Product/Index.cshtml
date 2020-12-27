@@ -48,10 +48,29 @@
                                         <image src="/images/product/@product.product_image" alt="img" width="80">
                                     </td>
                                     <td>@product.product_name</td>
-                                    <td class="text-right font-weight-bold text-primary">@product.prodoct_price</td>
-                                    <td>@product.product_state</td>
-                                    <td>@product.product_kind</td>
-                                    <td>@product.category_id</td>
+                                    <td class="text-right font-weight-bold text-primary">@product.product_price</td>
+                                    <td>
+                                        @if (product.product_state == 0)
+                                        {
+                                            <span class="text-white bg-secondary p-1">tạm ngưng</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-white bg-success p-1">mở bán</span>
+                                        }
+
+                                    </td>
+                                    <td>
+                                        @if (product.product_kind == 0)
+                                        {
+                                            <span class="text-white bg-secondary p-1">thường</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-white bg-warning p-1">nổi bật</span>
+                                        }
+                                    </td>
+                                    <td>@product.category_name</td>
                                     <td>@product.product_created_at</td>
                                     <td>
                                         <a href="/admin/product/info/@product.product_id"

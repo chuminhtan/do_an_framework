@@ -113,7 +113,7 @@ namespace do_an_framework.Controllers
                             product_id = reader.GetFieldValue<int>(0),
                             product_image = reader.GetFieldValue<string>(1),
                             product_name = reader.GetFieldValue<string>(2),
-                            prodoct_price = reader.GetFieldValue<int>(3),
+                            product_price = reader.GetFieldValue<int>(3),
                             category_name = reader.GetFieldValue<string>(4)
                         };
                         productList.Add(z);
