@@ -294,7 +294,7 @@ namespace do_an_framework.Controllers
         /**
          * Delete Product
          */
-        public async Task<IActionResult> Delete(int id)
+        public IActionResult Delete(int id)
         {
             int productId = id;
 
