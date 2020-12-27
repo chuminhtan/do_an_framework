@@ -29,12 +29,16 @@ namespace do_an_framework.Controllers
             this.MySqlDatabase = mySqlDb;
             this._hostEnvironment = hostEnvironment;
         }
-
+        
+        
+        /**
+         Get User List
+         */
         public async Task<List<UserModel>> UserList()
         {
             var userList = new List<UserModel>();
             var cmd = this.MySqlDatabase.Connection.CreateCommand() as MySqlCommand;
-            cmd.CommandText = @"SELECT ma_nguoi_dung, ten_nguoi_dung FROM nguoI_dung";
+            cmd.CommandText = @"SELECT * FROM nguoi_dung";
 
             using (var reader = await cmd.ExecuteReaderAsync())
                 while (await reader.ReadAsync())
@@ -42,7 +46,13 @@ namespace do_an_framework.Controllers
                     var t = new UserModel()
                     {
                         user_id= reader.GetFieldValue<int>(0),
-                        user_name = reader.GetFieldValue<string>(1)
+                        user_name = reader.GetFieldValue<string>(1),
+                        user_phone = reader.GetFieldValue<string>(2),
+                        user_type = reader.GetFieldValue<int>(3),
+                        user_email = reader.GetFieldValue<string>(4),
+                        user_password = reader.GetFieldValue<string>(5),
+                        user_image = reader.GetFieldValue<string>(6),
+                        user_created_at = reader.GetFieldValue<DateTime>(8),
                     };
 
                     userList.Add(t);
@@ -58,7 +68,7 @@ namespace do_an_framework.Controllers
         }
 
         // Create View
-        public IActionResult CreateView()
+        public IActionResult Create()
         {
             return View();
         }
@@ -67,7 +77,7 @@ namespace do_an_framework.Controllers
         public async Task<IActionResult> Insert(List<IFormFile> user_image)
         {
             long size = user_image.Sum(f => f.Length);
-
+            string newFileName = "";
             foreach (var formFile in user_image)
             {
                 if (formFile.Length > 0)
@@ -82,10 +92,10 @@ namespace do_an_framework.Controllers
                     string extension = Path.GetExtension(formFile.FileName);
 
                     // Phải nối file + random thời gian để tạo fileName mới
-                    string newFileName = fileName + DateTime.Now.ToString("yymmssfff") + extension;
+                    newFileName = fileName + DateTime.Now.ToString("yymmssfff") + extension;
 
                     // Tạo đường dẫn tới thư mục lưu file = Root 
-                    string path = Path.Combine(wwwrootPath + "/images/product/" + newFileName);
+                    string path = Path.Combine(wwwrootPath + "/images/user/" + newFileName);
 
                     // Lưu file vào thư mục theo đường dẫn đã chỉ định
                     using (var stream = new FileStream(path, FileMode.Create))
@@ -96,29 +106,30 @@ namespace do_an_framework.Controllers
             }
 
 
-                      string response = null;
+            var cmd = this.MySqlDatabase.Connection.CreateCommand() as MySqlCommand;
 
-                      var cmd = this.MySqlDatabase.Connection.CreateCommand() as MySqlCommand;
-
-                      cmd.CommandText = @"INSERT INTO nguoi_dung(ma_nguoi_dung, ten_nguoi_dung, dien_thoai, loai, email, mat_khau, anh_nguoi_dungt) VALUES (@user_id, @user_name, @user_phone, @user_permission, @user_email, @user_password, @user_image);";
-                        BCrypt.Net.BCrypt.HashPassword("Pa$$w0rd");
+             cmd.CommandText = @"INSERT INTO nguoi_dung(ten_nguoi_dung, dien_thoai, loai, email, mat_khau, anh_nguoi_dung) VALUES (@user_name, @user_phone, @user_permission, @user_email, @user_password, @user_image);";
 
             cmd.Parameters.AddWithValue("@user_name", Request.Form["user_name"]);
                       cmd.Parameters.AddWithValue("@user_phone", Request.Form["user_phone"]);
                       cmd.Parameters.AddWithValue("@user_permission", Request.Form["user_"]);
                       cmd.Parameters.AddWithValue("@user_email", Request.Form["user_email"]);
                       cmd.Parameters.AddWithValue("@user_password", BCrypt.Net.BCrypt.HashPassword(Request.Form["user_password"]));
-                      cmd.Parameters.AddWithValue("@user_image", Request.Form["user_password"]);
+                      cmd.Parameters.AddWithValue("@user_image", newFileName);
 
                       var recs = cmd.ExecuteNonQuery();
 
-                      if (recs == 1)
-                          response = "OK";
-                      else
-                          response = "Sorry! I didn't get that.";
-
-
-            return Content("OK");
+            if (recs == 1)
+            {
+                ViewData["result"] = "success";
+                ViewData["message"] = "Đã tạo tài khoản";
+            }
+            else
+            {
+                ViewData["result"] = "fail";
+                ViewData["message"] = "Lỗi";
+            }
+            return Redirect("/admin/user/index");
         }
     }
 }

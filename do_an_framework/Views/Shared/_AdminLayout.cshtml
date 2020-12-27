@@ -93,12 +93,29 @@
     <!-- Page level custom scripts -->
     <!-- <script src="admin-assets/js/demo/chart-area-demo.js"></script>
     <script src="admin-assets/js/demo/chart-pie-demo.js"></script> -->
-
     <!-- Script tự viết -->
     @RenderSection("script", required: false)
 
     <script>
-		// Kiểm tra kết quả xử lý
+	// Kiểm tra kết quả xử lý
+    const result = @ViewData["result"];
+    const message = @ViewData["message"];
+    if (result == "success") {
+        Swal.fire({
+            title: 'Thành Công',
+            text: message,
+            icon: 'success',
+            showConfirmButton: false,
+            timer: 1300
+        })
+    } else if (result == "fail") {
+                    Swal.fire({
+                title: 'Thất Bại',
+                text: message,
+                icon: 'error',
+                showConfirmButton: true,
+            })
+    }
     </script>
 </body>
 
