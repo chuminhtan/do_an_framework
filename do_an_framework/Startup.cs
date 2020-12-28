@@ -9,6 +9,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using do_an_framework.Models;
 using Microsoft.AspNetCore.Http;
+using do_an_framework.Middleware;
 
 namespace do_an_framework
 {
@@ -51,7 +52,10 @@ namespace do_an_framework
                 app.UseExceptionHandler("/Home/Error");
             }
             app.UseSession();
+
             app.UseStaticFiles();
+
+            app.UseCheckLoginAccess();
 
             app.UseRouting();
 
@@ -61,10 +65,11 @@ namespace do_an_framework
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "/{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapControllerRoute(
                     name: "admin",
-                    pattern: "admin/{controller}/{action=Index}/{id?}");
+                    pattern: "admin/{controller=Home}/{action=Index}/{id?}");
+
             });
 
             

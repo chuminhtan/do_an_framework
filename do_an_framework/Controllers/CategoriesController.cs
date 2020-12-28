@@ -203,7 +203,6 @@ namespace do_an_framework.Controllers
 
         // POST: CategoriesController/Info/5
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public ActionResult Info(int id, IFormCollection collection)
         {
             try
@@ -211,7 +210,6 @@ namespace do_an_framework.Controllers
                 CategoryModel category = new CategoryModel();
                 if (ModelState.IsValid)
                 {
-                    Int32.TryParse(collection["id"], out id);
                     category.id = id;
                     category.name = collection["name"];
                     category.description = collection["description"];
@@ -233,15 +231,13 @@ namespace do_an_framework.Controllers
                     return View();
                 }
             }
-            catch
+            catch(Exception e)
             {
-                return View();
+                return View(e.ToString());
             }
         }
 
         // POST: CategoriesController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
         public ActionResult Delete(int id)
         {
             try
