@@ -9,8 +9,8 @@ namespace do_an_framework.Models
     {
         public int product_id { get; set; }
         public string product_name { get; set; }
-        public string product_discription { get; set; }
-        public int prodoct_price { get; set; }
+        public string product_description { get; set; }
+        public int product_price { get; set; }
         public int product_state { get; set; }
         public int product_kind { get; set; }
         public string product_image { get; set; }

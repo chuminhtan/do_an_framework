@@ -12,5 +12,7 @@ namespace do_an_framework.Models
         public int count { get; set; }
         public int price { get; set; }
         public int total { get; set; }
+        public string product_name { get; set; }
+        public string product_image { get; set; }
     }
 }

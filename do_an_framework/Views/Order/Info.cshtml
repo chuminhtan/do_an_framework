@@ -1,0 +1,355 @@
+﻿@{ 
+    var order = ViewData["Order"] as OrderModel;
+    List<OrderDetailModel> detailList = ViewBag["Details"];
+    List<ProductModel> productlist = ViewBag["Products"];
+    List<CategoryModel> categorylist = ViewBag["Categories"];
+}
+<!-- Page Body -->
+<div class="row">
+    <!-- Cột Bên Trái-->
+    <div class="col-md-8">
+
+        <!-- Chi Tiết Đơn Hàng -->
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="text-center font-weight-bold mb-3">Giỏ Hàng</h5>
+                <form asp-action="Update" asp-controller="OrderDetail" method="POST">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Mã Sản Phẩm</th>
+                                <th>Ảnh</th>
+                                <th>Tên Sản Phẩm</th>
+                                <th class="text-right">Đơn Giá</th>
+                                <th class="text-center">Số Lượng</th>
+                                <th class="text-right font-weight-bold">Thành Tiền</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table_body_order_detail">
+                            <input type="number" name="order_id" hidden value="@order.order_id">
+                            @{ 
+                                if (detailList != null) // Kiểm tra tồn tại list chi tiết hóa đơn ?
+                                {
+                                    var number = 1;
+                                    foreach (var detail in detailList) // Duyệt từng chi tiết
+                                    {
+                                        <tr>
+                                            <td>@number</td>
+                                            <td>
+                                                @detail.order_id
+                                                <input type="number" class="id_list" name="product_id_list[]" hidden
+                                                       value="@detail.product_id">
+                                            </td>
+                                            <td>
+                                                <image src="@detail.product_image" alt="img"
+                                                       width="80">
+                                            </td>
+                                            <td>@detail.product_name</td>
+                                            <td class="text-primary text-right" id="@detail.product_id-price"
+                                                value="@detail.price">
+                                                @detail.price
+                                            </td>
+                                            <td>
+                                                <input type="number" name="quantity_updated_list[]"
+                                                       id="@detail.product_id-quantity" min="0"
+                                                       class="form-control text-center text-center font-weight-bold"
+                                                       value=@detail.count onchange="changeProductQuantity(this);">
+                                            </td>
+                                            <td class="text-primary font-weight-bold text-right amount"
+                                                id="@detail.product_id-amount" class="text-right"
+                                                value="@detail.total">
+                                                @detail.total
+                                            </td>
+                                        </tr>
+                                        number++;
+                                    }
+                                }
+                            }
+                        </tbody>
+                        </table>
+                        <div class="row">
+                            <div class="col-md-8"></div>
+                            <div class="col-md-2">
+                                <p class="text-primary font-weight-bold text-right">Tổng Tiền</p>
+                            </div>
+                            <div class="col-md-2">
+                                <p class="text-danger font-weight-bold text-right" id="amount_total"></p>
+                            </div>
+
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <!-- btn modal thêm sản phẩm -->
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".addProduct">
+                                <i class="fas fa-cart-plus"></i>
+                            </button>
+                            <!-- btn cập nhật sản phẩm -->
+                            <button class="btn btn-primary" type="submit" id="btn_update_order_detail">Cập Nhật</button>
+                        </div>
+                    </form>
+
+                <!-- Modal -->
+                <div class="modal fade addProduct" id="exampleModal" tabindex="-1" role="dialog"
+                    aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-xl" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title text-primary text-center font-weight-bold"
+                                    id="exampleModalLabel">Chọn Sản Phẩm
+                                </h4>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row">
+                                    <!-- Bảng và Sản phẩm -->
+                                    <table class="table table-striped table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Mã</th>
+                                                <th>Ảnh</th>
+                                                <th>Tên</th>
+                                                <th>Giá Bán</th>
+                                                <th>Danh Mục</th>
+                                                <th>Thao Tác</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @{
+                                                if (productlist != null)
+                                                {
+                                                    foreach (var product in productlist)
+                                                    {
+                                                        <tr>
+                                                            <td id="@product.product_id-add_product_id">
+                                                                @product.product_id
+                                                            </td>
+                                                            <td>
+                                                                <image id="@product.product_id-add_product_image"
+                                                                    src="@product.product_image"
+                                                                    alt="img" width="80">
+                                                            </td>
+                                                            <td id="@product.product_id-add_product_name"
+                                                                value="@product.product_name">
+                                                                @product.product_name
+                                                            </td>
+                                                            <td id="@product.product_id-add_product_price"
+                                                                value="@product.product_price">
+                                                                @product.product_price
+                                                            </td>
+                                                            <td>
+                                                                @{ 
+                                                                    foreach (var category in categorylist)
+                                                                    {
+                                                                        if (product.category_id == category.id)
+                                                                            @category.name
+                                                                    }
+                                                                }
+                                                            </td>
+                                                            <td><button class="btn btn-primary"
+                                                                    id="@product.product_id-add_product"
+                                                                    onclick="addProduct(this);"><i
+                                                                        class="fas fa-plus-square"></i></button></td>
+                                                        </tr>
+                                                    }
+                                                }
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tình Trạng Đơn Hàng -->
+        <div class="card">
+            <div class="card-body">
+                <h5 class="text-center font-weight-bold mb-3">Nhân Viên</h5>
+
+                <!-- Form -->
+                <form method="POST" action="{{ url("admin/order/info/confirm/2") }}">
+                    <input type="number" name="order_id" value="@order.order_id" hidden>
+
+                    <!-- Ghi Chú -->
+                    <div class=" row">
+                        <div class="col-md-2">
+                            <p>Ghi Chú:</p>
+                        </div>
+                        <div class="col-md-10">
+                            <textarea name="user_note" class="font-weight-bold form-control"
+                                      rows="5">@order.user_note</textarea>
+                        </div>
+                    </div>
+                    <div class="row mb-5 mt-5 d-flex justify-content-center">
+                        <a href="Ham huy"
+                           class="btn btn-danger mr-5">Hủy Đơn Hàng</a>
+                        <button type="submit" class="btn btn-success">Xác Nhận Đơn Hàng</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <!-- Thông tin khách hàng - Cột bên phải -->
+        <div class="card">
+            <div class="card-body">
+                <h5 class="text-center font-weight-bold mb-3">Khách Hàng</h5>
+                <form action="Cap Nhat khach hang" method="POST">
+                    <input type="number" name="order_id" value="@order.order_id" hidden>
+                    <div class="row mb-3">
+                        <p class="col-md-4">Họ Tên:</p>
+                        <input type="text" name="customer_name" class="col-md-8 form-control font-weight-bold"
+                            value="@order.customer_name" required>
+                    </div>
+                    <div class="row mb-3">
+                        <p class="col-md-4">Điện Thoại:</p>
+                        <input type="text" name="customer_phone" class="col-md-8 form-control font-weight-bold"
+                            value="@order.customer_phone" required>
+                    </div>
+                    <div class="row mb-3">
+                        <p class="col-md-4">Địa Chỉ:</p>
+                        <textarea name="customer_address" class="col-md-8 font-weight-bold form-control" cols="30"
+                            rows="4" required>@order.address</textarea>
+                    </div>
+                    <div class="row mb-3">
+                        <p class="col-md-4">Ngày Giao:</p>
+                        <input type="datetime-local" name="customer_time_delivery" class="form-control col-md-8"
+                            id="customer_time"
+                            value="@order.delivery_time"
+                            required>
+                    </div>
+                    <div class="row mb-3">
+                        <p class="col-md-4">Ghi Chú:</p>
+                        <textarea name="customer_note" class="col-md-8 font-weight-bold form-control" cols="30"
+                            rows="4">@order.customer_note</textarea>
+                    </div>
+                    <div class="d-flex justify-content-end">
+                        <button class="btn btn-primary" type="submit">Cập Nhật</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Lịch Sử -->
+        <div class="card mt-3">
+            <div class="card-body">
+                <h5 class="text-center font-weight-bold mb-3">Lịch Sử</h5>
+                <textarea name="order_history" class=" form-control" rows="15" readonly>@order.history</textarea>
+            </div>
+        </div>
+    </div>
+    <!-- kết thúc main-container -->
+
+    <!-- Java Script -->
+    <script>
+        // Kiểm tra biến errors từ server gửi về. Nếu có lỗi xuất popup thông báo
+        /*if(count($errors) > 0)
+        Swal.fire({
+            title: 'Thất Bại',
+            text: 'Vui lòng kiểm tra lại thông tin',
+            icon: 'error',
+            confirmButtonText: 'OK'
+        })*/
+        
+
+        // Change Product Quantity
+        const changeProductQuantity = (inputQuantity) => {
+            const productId = inputQuantity.id.split("-")[0];
+            const productPrice = document.getElementById(`${productId}-price`).getAttribute('value');
+            const productQuantity = inputQuantity.value
+
+            const amount_dom = document.getElementById(`${productId}-amount`)
+
+            let amount = parseInt(productPrice) * parseInt(productQuantity);
+
+            if (isNaN(amount)) {
+                amount = 0;
+            }
+            amount_dom.innerHTML = amount
+            amount_dom.setAttribute('value', amount)
+
+            getTotalAmount()
+        }
+
+        // Get total amount
+        const getTotalAmount = () => {
+            const amount_total_dom = document.querySelector('#amount_total')
+            const amount_list_dom = document.querySelectorAll('.amount');
+            const amount_list = Array.from(amount_list_dom);
+            console.log(amount_list);
+
+            let amount_total = 0;
+
+            amount_list.forEach((amount) => {
+                amount_total += parseInt(amount.getAttribute('value'))
+            })
+
+            console.log(amount_total)
+            amount_total_dom.innerHTML = amount_total
+        }
+        getTotalAmount();
+
+        // Add Product
+        const addProduct = (btnAdd) => {
+            const table_body_order_detail_dom = document.querySelector('#table_body_order_detail')
+            const product_id = btnAdd.id.split('-')[0]
+            const product_image = document.getElementById(`${product_id}-add_product_image`).src;
+            const product_name = document.getElementById(`${product_id}-add_product_name`).getAttribute('value')
+            const product_price = document.getElementById(`${product_id}-add_product_price`).getAttribute('value')
+
+            const id_list_dom = document.querySelectorAll('.id_list')
+            const id_list = Array.from(id_list_dom)
+            console.log(id_list)
+            let number = id_list.length
+            for (let i = 0; i < number; i++) {
+                console.log(id_list[i])
+                if (product_id == id_list[i].value) {
+                    return
+                }
+            }
+
+
+            console.log(product_id)
+            console.log(product_name)
+            console.log(product_price)
+            console.log(product_image)
+
+            let tr_html = ` <tr>
+                                <td>%number%</td>
+                                <td>
+                                    %product_id%
+                                    <input type="number" class="id_list" name="product_id_list[]" hidden
+                                        value="%product_id%">
+                                </td>
+                                <td>
+                                    <image src="%product_image%" alt="img"
+                                        width="80">
+                                </td>
+                                <td>%product_name%</td>
+                                <td class="text-primary text-right" id="%product_id%-price"
+                                    value="%product_price%">
+                                    %product_price%</td>
+                                <td>
+                                    <input type="number" name="quantity_updated_list[]"
+                                        id="%product_id%-quantity" min="0"
+                                        class="form-control text-center text-center font-weight-bold"
+                                        value="0" onchange="changeProductQuantity(this);">
+                                </td>
+                                <td class="text-primary font-weight-bold text-right amount"
+                                    id="%product_id%-amount" class="text-right"
+                                    value="0">0</td>
+                            </tr>`
+            tr_html = tr_html.replaceAll('%number%', ++number)
+            tr_html = tr_html.replaceAll('%product_id%', product_id)
+            tr_html = tr_html.replaceAll('%product_name%', product_name)
+            tr_html = tr_html.replaceAll('%product_price%', product_price)
+            tr_html = tr_html.replaceAll('%product_image%', product_image)
+
+            table_body_order_detail_dom.insertAdjacentHTML('beforeend', tr_html)
+        }
+    </script>

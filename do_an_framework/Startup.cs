@@ -68,8 +68,7 @@ namespace do_an_framework
                     pattern: "/{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapControllerRoute(
                     name: "admin",
-                    pattern: "admin/{controller=Home}/{action=Index}/{id?}");
-
+                    pattern: "admin/{controller}/{action=Index}/{id?}");
             });
 
             

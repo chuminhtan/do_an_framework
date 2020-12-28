@@ -68,8 +68,8 @@ namespace do_an_framework.Controllers
                     ProductModel product = new ProductModel();
                     product.product_id= reader.GetInt32(0);
                     product.product_name = reader.GetString(1);
-                    product.product_discription = reader.GetString(2);
-                    product.prodoct_price = reader.GetInt32(3);
+                    product.product_description = reader.GetString(2);
+                    product.product_price = reader.GetInt32(3);
                     product.product_state = reader.GetInt32(4);
                     product.product_kind = reader.GetInt32(5);
                     product.product_image = reader.GetString(6);
@@ -112,7 +112,7 @@ namespace do_an_framework.Controllers
                     product.product_id = reader.GetInt32(2);
                     product.product_name = reader.GetString(3);
                     product.product_image = reader.GetString(4);
-                    product.prodoct_price = reader.GetInt32(5);
+                    product.product_price = reader.GetInt32(5);
                     products.Add(product);
                 }
                 reader.Close();
@@ -143,8 +143,8 @@ namespace do_an_framework.Controllers
                 {
                     product.product_id = reader.GetInt32(0);
                     product.product_name = reader.GetString(1);
-                    product.product_discription = reader.GetString(2);
-                    product.prodoct_price = reader.GetInt32(3);
+                    product.product_description = reader.GetString(2);
+                    product.product_price = reader.GetInt32(3);
                     product.product_state = reader.GetInt32(4);
                     product.product_kind = reader.GetInt32(5);
                     product.product_image = reader.GetString(6);
