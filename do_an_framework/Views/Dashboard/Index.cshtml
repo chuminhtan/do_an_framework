@@ -1,11 +1,10 @@
 ﻿@{
     var incomeYear = ViewBag.incomeyear;
-    var incomeMonth = ViewData["incomemonth"];
-    var countProduct = ViewData["countproduct"];
-    var pendingOrder = ViewData["pendingorder"];
+    var incomeMonth = ViewBag.incomemonth;
+    var countProduct = ViewBag.countproduct;
+    var pendingOrder = ViewBag.pendingorder;
     var incomePerMonth = ViewBag.incomepermonth;
     var percentOrder = ViewBag.percentorder;
-
 }
 
 
@@ -200,13 +199,12 @@
 	const earn_month_list = [];
 
 	@{
-    int i = 1;
-    foreach(var income in incomePerMonth)
-    {
+		foreach(var income in incomePerMonth)
+		{
 
-		@:earn_month_list.push(@income);
-}
-}
+			@:earn_month_list.push(@income);
+		}
+	}
 
 
 	console.log(earn_month_list);
@@ -305,7 +303,13 @@
 	// BIỂU ĐỒ TÌNH TRẠNG ĐƠN HÀNG
 
 	let order_percent_list = []
+	@{
+		foreach(var x in percentOrder)
+		{
 
+			@:order_percent_list.push(@x);
+		}
+	}
 
 	console.log(order_percent_list)
 
@@ -344,5 +348,5 @@
 			cutoutPercentage: 80,
 		},
 	});
-</script>
+    </script>
 }

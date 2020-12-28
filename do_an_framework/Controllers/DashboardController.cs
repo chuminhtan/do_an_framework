@@ -19,16 +19,13 @@ namespace do_an_framework.Controllers
         }
         public IActionResult Index()
         {
-            
+            ViewBag.incomeyear = GetIncomeYear();
+            ViewBag.incomemonth = GetIncomeMonth();
+            ViewBag.countproduct = GetCountProduct();
+            ViewBag.pendingorder = GetNumPendingOrder();
             ViewBag.incomepermonth = GetIncomePerMonth();
-            /*
-            ViewData["incomeyear"] = GetIncomeYear();
-            ViewData["incomemonth"] = GetIncomeMonth();
-            ViewData["countproduct"] = GetCountProduct();
-            ViewData["pendingorder"] = GetNumPendingOrder();
-            
-            ViewBag["percentorder"] = Percent(GetOrderPerStatus(), GetNumOrderYear());
-            */
+            int t = GetNumOrderYear();
+            ViewBag.percentorder = GetOrderPerStatus(t);
             return View();
         }
 
@@ -48,6 +45,7 @@ namespace do_an_framework.Controllers
                     incomeYear = reader.GetInt32(0);
                 }
             }
+            reader.Close();
             return incomeYear;
         }
 
@@ -69,6 +67,7 @@ namespace do_an_framework.Controllers
                     incomeMonth = reader.GetInt32(0);
                 }
             }
+            reader.Close();
             return incomeMonth;
         }
 
@@ -90,6 +89,7 @@ namespace do_an_framework.Controllers
                     number = reader.GetInt32(0);
                 }
             }
+            reader.Close();
             return number;
         }
 
@@ -106,6 +106,7 @@ namespace do_an_framework.Controllers
                     number = reader.GetInt32(0);
                 }
             }
+            reader.Close();
             return number;
         }
 
@@ -159,14 +160,16 @@ namespace do_an_framework.Controllers
                     number = reader.GetInt32(0);
                 }
             }
+            reader.Close();
+
             return number;
         }
 
-        public List<int> GetOrderPerStatus()
+        public List<int> GetOrderPerStatus(int numorder)
         {
             List<int> number = new List<int>();
             int year = DateTime.Now.Year;
-            var sql = "Select tinh_trang, count(ma_don_hang) from don_hang where YEAR(thoi_gian_tao) = @year group by tinh_trang order by tinh_trang";
+            var sql = "Select tinh_trang, count(ma_don_hang) as sl from don_hang where YEAR(thoi_gian_tao) = @year group by tinh_trang order by tinh_trang";
             var command = new MySqlCommand(sql, MySqlDatabase.Connection);
             command.CommandText = sql;
             command.Parameters.AddWithValue("year", year);
@@ -175,21 +178,14 @@ namespace do_an_framework.Controllers
             {
                 while (reader.Read())
                 {
-                    number.Add(reader.GetInt32(0));
+                    int t = Convert.ToInt32(reader["sl"]);
+                    number.Add((t*100)/numorder);
                 }
             }
+            reader.Close();
 
             return number;
         }
 
-        public List<int> Percent(List<int> number, int total_order)
-        {
-            List<int> result = new List<int>();
-            foreach (var i in number)
-            {
-                result.Add(i / total_order * 100);
-            }
-            return result;
-        }
     }
 }
