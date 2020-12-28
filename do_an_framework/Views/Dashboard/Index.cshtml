@@ -1,12 +1,14 @@
-﻿@{ 
-    var incomeYear = ViewData["incomeyear"];
+﻿@{
+    var incomeYear = ViewBag.incomeyear;
     var incomeMonth = ViewData["incomemonth"];
     var countProduct = ViewData["countproduct"];
     var pendingOrder = ViewData["pendingorder"];
-    var incomePerMonth = ViewBag["incomepermonth"] as List<int>;
-    var percentOrder = ViewBag["percentorder"] as List<int>;
+    var incomePerMonth = ViewBag.incomepermonth;
+    var percentOrder = ViewBag.percentorder;
 
 }
+
+
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
     <h1 class="h3 mb-0 text-primary font-weight-bold">Dashboard</h1>
@@ -163,7 +165,8 @@
 </div>
 <!-- kết thúc main-container -->
 
-<script>
+@section script {
+    <script>
 	// BIỂU ĐỒ DOANH THU
 	// Set new default font family and font color to mimic Bootstrap's default styling
 	Chart.defaults.global.defaultFontFamily = 'Nunito', '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
@@ -195,9 +198,16 @@
 	}
 
 	const earn_month_list = [];
-	@foreach($earn_month_list as $earn_month)
-	earn_month_list.push({{ $earn_month }});
-	@endforeach
+
+	@{
+    int i = 1;
+    foreach(var income in incomePerMonth)
+    {
+
+		@:earn_month_list.push(@income);
+}
+}
+
 
 	console.log(earn_month_list);
 	// Area Chart Example
@@ -295,9 +305,7 @@
 	// BIỂU ĐỒ TÌNH TRẠNG ĐƠN HÀNG
 
 	let order_percent_list = []
-	@foreach($order_percent_list as $order_percent)
-	order_percent_list.push( {{ $order_percent }} );
-	@endforeach
+
 
 	console.log(order_percent_list)
 
@@ -337,3 +345,4 @@
 		},
 	});
 </script>
+}

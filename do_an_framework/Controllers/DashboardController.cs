@@ -10,21 +10,25 @@ using MySql.Data.MySqlClient;
 
 namespace do_an_framework.Controllers
 {
-    public class AdminController : Controller
+    public class DashboardController : Controller
     {
         private MySqlDatabase MySqlDatabase { get; set; }
-        public AdminController(MySqlDatabase mySqlDb)
+        public DashboardController(MySqlDatabase mySqlDb)
         {
             this.MySqlDatabase = mySqlDb;
         }
         public IActionResult Index()
         {
+            
+            ViewBag.incomepermonth = GetIncomePerMonth();
+            /*
             ViewData["incomeyear"] = GetIncomeYear();
             ViewData["incomemonth"] = GetIncomeMonth();
             ViewData["countproduct"] = GetCountProduct();
             ViewData["pendingorder"] = GetNumPendingOrder();
-            ViewBag["incomepermonth"] = GetIncomePerMonth();
+            
             ViewBag["percentorder"] = Percent(GetOrderPerStatus(), GetNumOrderYear());
+            */
             return View();
         }
 
@@ -110,21 +114,30 @@ namespace do_an_framework.Controllers
             List<int> income = new List<int>();
             var year = DateTime.Now.Year;
 
-            for (var i = 1; i <= 12; i++)
-            {
-                var sql = "Select sum(tong_tien) from don_hang where tinh_trang = 3 and YEAR(thoi_gian_tao) = @year and MONTH(thoi_gian_tao) = @month";
+            //var sql = "Select MONTH(thoi_gian_tao), sum(tong_tien) from don_hang where tinh_trang = 3 and YEAR(thoi_gian_tao) = @year group by MONTH(thoi_gian_tao) order by MONTH(thoi_gian_tao)";
+            
+            for (int i = 1; i <= 12; i++)
+            {  
+                var sql = "Select MONTH(thoi_gian_tao), sum(tong_tien) from don_hang where tinh_trang = 3 and YEAR(thoi_gian_tao) = @year and MONTH(thoi_gian_tao)=@month group by MONTH(thoi_gian_tao) order by MONTH(thoi_gian_tao)";
                 var command = new MySqlCommand(sql, MySqlDatabase.Connection);
                 command.CommandText = sql;
-                command.Parameters.AddWithValue("year", year);
-                command.Parameters.AddWithValue("month", i);
+                command.Parameters.AddWithValue("@year", year);
+                command.Parameters.AddWithValue("@month", i);
+
                 var reader = command.ExecuteReader();
+
                 if (reader.HasRows)
                 {
                     while (reader.Read())
                     {
-                        income.Add(reader.GetInt32(0));
+                        income.Add(reader.GetInt32(1));
                     }
+                } else
+                {
+                    income.Add(0);
                 }
+
+                reader.Close();
             }
 
             return income;
