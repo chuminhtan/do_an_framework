@@ -1,8 +1,8 @@
 ﻿@{ 
-    var order = ViewData["Order"] as OrderModel;
-    List<OrderDetailModel> detailList = ViewBag["Details"];
-    List<ProductModel> productlist = ViewBag["Products"];
-    List<CategoryModel> categorylist = ViewBag["Categories"];
+    OrderModel order = ViewBag.Order;
+    List<OrderDetailModel> detailList = ViewBag.Details;
+    List<ProductModel> productList = ViewBag.Products;
+    List<CategoryModel> categoryList = ViewBag.Categories;
 }
 <!-- Page Body -->
 <div class="row">
@@ -27,7 +27,10 @@
                             </tr>
                         </thead>
                         <tbody id="table_body_order_detail">
-                            <input type="number" name="order_id" hidden value="@order.order_id">
+                            <tr style="display:none;">
+                                <td><input type="number" name="order_id" hidden value="@order.order_id"></td>
+                            </tr>
+
                             @{ 
                                 if (detailList != null) // Kiểm tra tồn tại list chi tiết hóa đơn ?
                                 {
@@ -42,7 +45,7 @@
                                                        value="@detail.product_id">
                                             </td>
                                             <td>
-                                                <image src="@detail.product_image" alt="img"
+                                                <image src="/images/product/@detail.product_image" alt="img"
                                                        width="80">
                                             </td>
                                             <td>@detail.product_name</td>
@@ -114,9 +117,9 @@
                                         </thead>
                                         <tbody>
                                             @{
-                                                if (productlist != null)
+                                                if (productList != null)
                                                 {
-                                                    foreach (var product in productlist)
+                                                    foreach (var product in productList)
                                                     {
                                                         <tr>
                                                             <td id="@product.product_id-add_product_id">
@@ -124,7 +127,7 @@
                                                             </td>
                                                             <td>
                                                                 <image id="@product.product_id-add_product_image"
-                                                                    src="@product.product_image"
+                                                                    src="~/admin/product/@product.product_image"
                                                                     alt="img" width="80">
                                                             </td>
                                                             <td id="@product.product_id-add_product_name"
@@ -136,13 +139,7 @@
                                                                 @product.product_price
                                                             </td>
                                                             <td>
-                                                                @{ 
-                                                                    foreach (var category in categorylist)
-                                                                    {
-                                                                        if (product.category_id == category.id)
-                                                                            @category.name
-                                                                    }
-                                                                }
+   
                                                             </td>
                                                             <td><button class="btn btn-primary"
                                                                     id="@product.product_id-add_product"
@@ -164,14 +161,13 @@
                 </div>
             </div>
         </div>
-
         <!-- Tình Trạng Đơn Hàng -->
         <div class="card">
             <div class="card-body">
                 <h5 class="text-center font-weight-bold mb-3">Nhân Viên</h5>
 
                 <!-- Form -->
-                <form method="POST" action="{{ url("admin/order/info/confirm/2") }}">
+                <form method="POST" action="">
                     <input type="number" name="order_id" value="@order.order_id" hidden>
 
                     <!-- Ghi Chú -->
@@ -204,33 +200,38 @@
                     <div class="row mb-3">
                         <p class="col-md-4">Họ Tên:</p>
                         <input type="text" name="customer_name" class="col-md-8 form-control font-weight-bold"
-                            value="@order.customer_name" required>
+                            value="@order.customer_name" required disabled>
                     </div>
                     <div class="row mb-3">
                         <p class="col-md-4">Điện Thoại:</p>
                         <input type="text" name="customer_phone" class="col-md-8 form-control font-weight-bold"
-                            value="@order.customer_phone" required>
+                            value="@order.customer_phone" required disabled>
                     </div>
                     <div class="row mb-3">
                         <p class="col-md-4">Địa Chỉ:</p>
                         <textarea name="customer_address" class="col-md-8 font-weight-bold form-control" cols="30"
-                            rows="4" required>@order.address</textarea>
+                            rows="4" required disabled>@order.address</textarea>
                     </div>
                     <div class="row mb-3">
                         <p class="col-md-4">Ngày Giao:</p>
+                        <!--
                         <input type="datetime-local" name="customer_time_delivery" class="form-control col-md-8"
                             id="customer_time"
-                            value="@order.delivery_time"
+                            value="
                             required>
+                            -->
+                        <p>@order.delivery_time</p>
                     </div>
                     <div class="row mb-3">
                         <p class="col-md-4">Ghi Chú:</p>
                         <textarea name="customer_note" class="col-md-8 font-weight-bold form-control" cols="30"
-                            rows="4">@order.customer_note</textarea>
+                            rows="4" disabled>@order.customer_note</textarea>
                     </div>
+                    <!--
                     <div class="d-flex justify-content-end">
                         <button class="btn btn-primary" type="submit">Cập Nhật</button>
                     </div>
+                    -->
                 </form>
             </div>
         </div>
@@ -242,6 +243,7 @@
                 <textarea name="order_history" class=" form-control" rows="15" readonly>@order.history</textarea>
             </div>
         </div>
+    </div>
     </div>
     <!-- kết thúc main-container -->
 
