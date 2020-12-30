@@ -75,7 +75,7 @@
                         <div class="col-lg-3 col-md-6 col-sm-6">
                             <div class="product__item">
                                 <div class="product__item__pic set-bg"
-                                     data-setbg="/images/product/@product.product_id"
+                                     data-setbg="/images/product/@product.product_image"
                                      style="background-image: url('/images/product/@product.product_image')">
                                     <div class="product__label">
                                         <span>@product.category_name</span>
@@ -87,7 +87,7 @@
                                     </h6>
                                     <div class="product__item__price">@(Convert.ToDecimal(product.product_price).ToString("#,##0"))</div>
                                     <div class="cart_add">
-                                        <a href="store/cart/@product.product_id">Thêm Giỏ Hàng</a>
+                                        <a href="/store/addproductcart/@product.product_id">Thêm Giỏ Hàng</a>
                                     </div>
                                 </div>
                             </div>

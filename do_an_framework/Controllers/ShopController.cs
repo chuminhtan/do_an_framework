@@ -131,11 +131,13 @@ namespace do_an_framework.Controllers
         // Lấy thông tin sản phẩm bằng key word
         public List<ProductModel> getListProductByName(string keyword)
         {
+            keyword = keyword.ToLower();
             List<ProductModel> products = new List<ProductModel>();
             var sql = "SELECT san_pham.*, danh_muc.ten_danh_muc " +
                 "FROM san_pham INNER JOIN danh_muc " +
                 "ON san_pham.ma_danh_muc = danh_muc.ma_danh_muc " +
-                "WHERE ten_san_pham LIKE '%" + keyword + "%'";
+                "WHERE LOWER(ten_san_pham) LIKE '%" + keyword + "%'";
+
             var command = new MySqlCommand(sql, MySqlDatabase.Connection);
 
             var reader = command.ExecuteReader();
@@ -301,20 +303,12 @@ namespace do_an_framework.Controllers
             return View(product);
         }
 
-        public IActionResult Search(string product_name, int page)
+        public IActionResult Search(string product_name)
         {
             List<ProductModel> products = new List<ProductModel>();
             products = getListProductByName(product_name);
             ViewData["key_word"] = product_name;
-            if (products.Count > PAGINATION)
-            {
-                ViewData["pages"] = products.Count / PAGINATION + 1;
-            }
-            else
-            {
-                ViewData["pages"] = 1;
-            }
-            products = getListProductByPagination(page);
+
             return View(products);
         }
     }

@@ -452,14 +452,14 @@ namespace do_an_framework.Controllers
 
             history += DateTime.Now + " - " + "user #" + HttpContext.Session.GetInt32("user_id") + " : Hủy đơn hàng\r\n";
            
-            string userNote = Request.Form["user_note"];
+            //string userNote = Request.Form["user_note"];
 
-            string queryUpdate = "UPDATE don_hang SET tinh_trang=0, ghi_chu_nhan_vien=@user_note, lich_su=@history WHERE ma_don_hang=@order_id";
+            string queryUpdate = "UPDATE don_hang SET tinh_trang=0, lich_su=@history WHERE ma_don_hang=@order_id";
 
             using (var commandUpdate = new MySqlCommand(queryUpdate, MySqlDatabase.Connection))
             {
                 commandUpdate.Parameters.AddWithValue("@order_id", orderId);
-                commandUpdate.Parameters.AddWithValue("@user_note", userNote);
+                //commandUpdate.Parameters.AddWithValue("@user_note", userNote);
                 commandUpdate.Parameters.AddWithValue("@history", history);
                 int resultInsert = commandUpdate.ExecuteNonQuery();
 

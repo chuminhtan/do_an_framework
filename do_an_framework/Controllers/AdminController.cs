@@ -93,6 +93,7 @@ namespace do_an_framework.Controllers
                         UserModel user = getUser(email);
                         var obj = JsonConvert.SerializeObject(user);
                         HttpContext.Session.SetString("user", obj);
+                        HttpContext.Session.SetInt32("user_id", user.user_id);
                         HttpContext.Session.SetString("result", "success");
                         HttpContext.Session.SetString("message", "Đăng nhập thành công");
                         return RedirectToAction("Index","User");

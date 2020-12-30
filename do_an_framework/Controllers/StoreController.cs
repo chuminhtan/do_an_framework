@@ -53,16 +53,16 @@ namespace do_an_framework.Controllers
                                                 "tong_so_luong," +
                                                 "lich_su," +
                                                 "tinh_trang) "+
-                        "VALUES(@name,@tel,@address,DATE_FORMAT(@deliveredtime, '% d /% l /% Y % H:% i:% s'), @note,@total,@amount,@lichsu,1)";
+                        "VALUES(@name,@tel,@address,@delivery_time, @note,@total,@amount,@lichsu,1)";
             var command = new MySqlCommand(sql, MySqlDatabase.Connection);
 
-            string lichsu = order.delivery_time.ToString() + ": ĐƠN HÀNG ĐƯỢC TẠO";
+            string lichsu = order.delivery_time.ToString() + ": ĐƠN HÀNG ĐƯỢC TẠO \n";
             DateTime created_time = new DateTime();
             command.CommandText = sql;
             command.Parameters.AddWithValue("name", order.customer_name);
             command.Parameters.AddWithValue("tel", order.customer_phone);
             command.Parameters.AddWithValue("address", order.address);
-            command.Parameters.AddWithValue("deliveredtime", order.delivery_time);
+            command.Parameters.AddWithValue("@delivery_time", order.delivery_time);
             command.Parameters.AddWithValue("note", order.customer_note);
             command.Parameters.AddWithValue("total", order.total);
             command.Parameters.AddWithValue("amount", order.count);
@@ -170,11 +170,17 @@ namespace do_an_framework.Controllers
             reader.Close();
             return listDetail;
         }
-        public IActionResult List(int id)
+
+        [HttpGet]
+        public IActionResult Cart()
         {
             return View();
         }
-        public IActionResult Cart(int id)
+
+
+        // CART GET
+        [HttpGet]
+        public IActionResult AddProductCart(int id)
         {
             bool isExist = false;
             if (HttpContext.Session.GetString("cart") != null)
@@ -292,7 +298,7 @@ namespace do_an_framework.Controllers
                 product_order.product_name = product.product_name;
                 product_order.product_price = product.product_price;
                 product_order.product_img = product.product_image;
-                product_order.quantity = Int32.Parse(quantities);
+                product_order.quantity = Int32.Parse(quantity);
                 List<CartModel> cart = new List<CartModel>(); // Tạo một list sản phẩm để đẩy lên session
                 cart.Add(product_order);
                 var obj = JsonConvert.SerializeObject(cart);
@@ -306,6 +312,8 @@ namespace do_an_framework.Controllers
             return View();
         }
 
+
+        // INSERT ORDER
         [HttpPost]
         public IActionResult Order(IFormCollection collection)
         {
@@ -314,10 +322,7 @@ namespace do_an_framework.Controllers
             order.customer_name = collection["customer_name"];
             order.address = collection["customer_address"];
             order.customer_phone = collection["customer_phone"].ToString();
-            var delivery_time = collection["customer_time_delivery"];
-            DateTime date;
-            bool checkdate = DateTime.TryParse(delivery_time, out date);
-            order.delivery_time = date;
+            order.delivery_time = Convert.ToDateTime(collection["customer_time_delivery"]);
             order.customer_note = collection["customer_note"];
             order.total = 0;
             order.count = 0;

@@ -40,7 +40,9 @@
                         <h4>@Model.product_name</h4>
                         <h5>@(Convert.ToDecimal(Model.product_price).ToString("#,##0"))</h5>
                         @{
-                            <div>@Model.product_description</div>
+                            <div>
+                        @Html.Raw(Model.product_description)
+                            </div>
                         }
                         <form action="/Store/cart" method="POST">
                             <input type="number" name="product_id" value="@Model.product_id" hidden>
