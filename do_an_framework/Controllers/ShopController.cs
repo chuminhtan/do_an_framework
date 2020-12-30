@@ -12,7 +12,7 @@ namespace do_an_framework.Controllers
     public class ShopController : Controller
     {
         // số sản phẩm trên 1 trang
-        const int PAGINATION = 10;
+        const int PAGINATION = 9;
         private MySqlDatabase MySqlDatabase { get; set; }
         public ShopController(MySqlDatabase mySqlDb)
         {

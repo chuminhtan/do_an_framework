@@ -71,12 +71,12 @@
                             for (int i = 1; i <= pages; i++)
                             {
                                 var parms = new Dictionary<string, string>
-                                            {
+                                                        {
                                     { "page",i.ToString()}
                                 };
 
                                 <li class="page-item">
-                                    <a asp-controller="Shop" asp-action="List" asp-all-route-data="parms">@i</a>
+                                    <a asp-controller="Shop" asp-action="List" asp-all-route-data="parms" class="page-link">@i</a>
                                 </li>
                             }
                         }

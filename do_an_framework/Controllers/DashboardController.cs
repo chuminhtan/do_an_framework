@@ -165,26 +165,29 @@ namespace do_an_framework.Controllers
             return number;
         }
 
-        public List<int> GetOrderPerStatus(int numorder)
+        public int[] GetOrderPerStatus(int numorder)
         {
-            List<int> number = new List<int>();
             int year = DateTime.Now.Year;
-            var sql = "Select tinh_trang, count(ma_don_hang) as sl from don_hang where YEAR(thoi_gian_tao) = @year group by tinh_trang order by tinh_trang";
-            var command = new MySqlCommand(sql, MySqlDatabase.Connection);
-            command.CommandText = sql;
-            command.Parameters.AddWithValue("year", year);
-            var reader = command.ExecuteReader();
-            if (reader.HasRows)
+            int[] percentList = new int[4];
+            for (int i=0; i<=3; i++)
             {
-                while (reader.Read())
+                var sql = "Select count(ma_don_hang) as sl from don_hang where YEAR(thoi_gian_tao) = @year and tinh_trang = @status";
+                var command = new MySqlCommand(sql, MySqlDatabase.Connection);
+                command.CommandText = sql;
+                command.Parameters.AddWithValue("year", year);
+                command.Parameters.AddWithValue("status", i);
+                var reader = command.ExecuteReader();
+                if (reader.HasRows)
                 {
-                    int t = Convert.ToInt32(reader["sl"]);
-                    number.Add((t*100)/numorder);
+                    while (reader.Read())
+                    {
+                        int t = Convert.ToInt32(reader["sl"]);
+                        percentList[i] = ((t * 100) / numorder);
+                    }
                 }
+                reader.Close();
             }
-            reader.Close();
-
-            return number;
+            return percentList;
         }
 
     }

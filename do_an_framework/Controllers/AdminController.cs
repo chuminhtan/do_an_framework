@@ -97,7 +97,7 @@ namespace do_an_framework.Controllers
                         HttpContext.Session.SetInt32("user_id", user.user_id);
                         HttpContext.Session.SetString("result", "success");
                         HttpContext.Session.SetString("message", "Đăng nhập thành công");
-                        return RedirectToAction("Index","User");
+                        return RedirectToAction("Index","Dashboard");
                     }
                     else
                     {

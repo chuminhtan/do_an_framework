@@ -68,7 +68,7 @@ namespace do_an_framework.Controllers
         public List<OrderModel> GetOrderList()
         {
             List<OrderModel> orderList = new List<OrderModel>();
-            var sql = "Select ma_don_hang, ten_khach_hang, dia_chi_giao_hang, thoi_gian_giao_hang, tong_tien, tinh_trang, thoi_gian_tao, dien_thoai_khach_hang from don_hang";
+            var sql = "Select ma_don_hang, ten_khach_hang, dia_chi_giao_hang, thoi_gian_giao_hang, tong_tien, tinh_trang, thoi_gian_tao, dien_thoai_khach_hang from don_hang order by ma_don_hang desc";
             var command = new MySqlCommand(sql, MySqlDatabase.Connection);
 
             var reader = command.ExecuteReader();
