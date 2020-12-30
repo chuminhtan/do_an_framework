@@ -57,10 +57,12 @@ namespace do_an_framework.Controllers
             return View(orderList);
         }
 
-        public ActionResult Info(int id)
+        public IActionResult Info(int id)
         {
+
             OrderModel order = new OrderModel();
             order = GetInfoOrder(id);
+
             if (order == null)
             {
                 HttpContext.Session.SetString("result", "fail");
@@ -69,10 +71,10 @@ namespace do_an_framework.Controllers
             }
             else
             {
-                ViewData["Order"] = order;
-                ViewBag["Details"] = GetListDetail(id);
-                ViewBag["Products"] = GetListProductForOrder();
-                ViewBag["Categories"] = GetListCategoryForOrder();
+                ViewBag.Order = order;
+                ViewBag.Details = GetListDetail(id);
+                ViewBag.Products = GetListProductForOrder();
+                ViewBag.Categories = GetListCategoryForOrder();
                 return View();
             }
         }
@@ -90,35 +92,44 @@ namespace do_an_framework.Controllers
             {
                 while (reader.Read())
                 {
-                    order.order_id = reader.GetInt32(0);
-                    order.customer_name = reader.GetString(1);
-                    order.customer_phone = reader.GetInt32(2).ToString();
-                    order.address = reader.GetString(3);
-                    order.delivery_time = reader.GetDateTime(4);
-                    order.customer_note = reader.GetString(5);
-                    order.total = reader.GetInt32(6);
-                    order.count = reader.GetInt32(7);
-                    order.status = reader.GetInt32(8);
-                    order.user_note = reader.GetString(9);
-                    order.order_time = reader.GetDateTime(10);
-                    order.history = reader.GetString(11);
-                    order.user_id = reader.GetInt32(12);
+                    order.order_id = Convert.ToInt32(reader["ma_don_hang"]);
+                    order.customer_name = reader["ten_khach_hang"].ToString();
+                    order.customer_phone = reader["dien_thoai_khach_hang"].ToString();
+                    order.address = reader["dia_chi_giao_hang"].ToString();
+                    order.delivery_time = Convert.ToDateTime(reader["thoi_gian_giao_hang"]);
+                    order.customer_note = reader["ghi_chu_khach_hang"].ToString();
+                    order.total = Convert.ToInt32(reader["tong_tien"]);
+                    order.count = Convert.ToInt32(reader["tong_so_luong"]);                
+                    order.status = Convert.ToInt32(reader["tinh_trang"]);
+                    order.user_note = reader["ghi_chu_nhan_vien"].ToString();
+                    order.order_time = Convert.ToDateTime(reader["thoi_gian_tao"]);
+                    order.history = reader["ghi_chu_nhan_vien"].ToString();
+
                 }
-            }
-            else
+            } else
+            {
                 order = null;
+            }
+               
+            reader.Close();
             return order;
         }
 
         public List<OrderDetailModel> GetListDetail(int id)
         {
+            int orderId = id;
+           
             List<OrderDetailModel> detailList = new List<OrderDetailModel>();
-            var sql = "Select chi_tiet_hoa_don.*, ten_san_pham, anh_san_pham from chi_tiet_hoa_don join san_pham on chi_tiet_hoa_don.ma_san_pham = san_pham.ma_san_pham where ma_don_hang = @id";
+
+            var sql = "Select chi_tiet_don_hang.*, ten_san_pham, anh_san_pham from chi_tiet_don_hang join san_pham on chi_tiet_don_hang.ma_san_pham = san_pham.ma_san_pham where ma_don_hang = @order_id";
+
             var command = new MySqlCommand(sql, MySqlDatabase.Connection);
+
             command.CommandText = sql;
-            command.Parameters.AddWithValue("id", id);
+            command.Parameters.AddWithValue("@order_id", orderId);
 
             var reader = command.ExecuteReader();
+
             if (reader.HasRows)
             {
                 while (reader.Read())
@@ -134,9 +145,13 @@ namespace do_an_framework.Controllers
 
                     detailList.Add(temp);
                 }
-            }
-            else
+            }else
+            {
                 detailList = null;
+            }
+
+            reader.Close();
+
             return detailList;
         }
 
@@ -159,9 +174,12 @@ namespace do_an_framework.Controllers
 
                     productList.Add(temp);
                 }
-            }
-            else
+            }else
+            {
                 return null;
+            }
+
+            reader.Close();
             return productList;
         }
 
