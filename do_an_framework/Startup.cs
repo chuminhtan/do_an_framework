@@ -11,6 +11,7 @@ using do_an_framework.Models;
 using Microsoft.AspNetCore.Http;
 using do_an_framework.Middleware;
 
+
 namespace do_an_framework
 {
     public class Startup
@@ -37,7 +38,6 @@ namespace do_an_framework
             services.AddSession(options => {                    // Đăng ký dịch vụ Session
                 options.IdleTimeout = new TimeSpan(0, 900, 0);    // Thời gian tồn tại của Session
             });
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -64,11 +64,11 @@ namespace do_an_framework
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
+    name: "admin",
+    pattern: "admin/{controller}/{action=Index}/{id?}");
+                endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "/{controller=Home}/{action=Index}/{id?}");
-                endpoints.MapControllerRoute(
-                    name: "admin",
-                    pattern: "admin/{controller}/{action=Index}/{id?}");
             });
 
             

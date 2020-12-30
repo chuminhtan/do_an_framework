@@ -73,7 +73,8 @@
                                                                      <div class="pro-qty text-right">
                                                                           <input type="number" name="product_quantity_list[]"
                                                                                  class="form-control border text-center"
-                                                                                 value="@product.quantity" min="0">
+                                                                                 id="@product.product_id-quantity"
+                                                                                 value="@product.quantity" min="0" onchange="updateQuantity(this);">
                                                                      </div>
                                                                 </div>
                                                           </td>

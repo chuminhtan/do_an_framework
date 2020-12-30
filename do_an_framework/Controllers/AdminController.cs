@@ -68,7 +68,8 @@ namespace do_an_framework.Controllers
                 while (reader.Read())
                 {
                     user.user_id = reader.GetInt32(0);
-                    user.user_name = reader.GetString(1);
+                    user.user_name = reader["ten_nguoi_dung"].ToString();
+                    user.user_name = reader["email"].ToString();
                     user.user_type = reader.GetInt32(3);
                     user.user_image = reader.GetString(6);
                 }
