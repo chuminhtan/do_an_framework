@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using MySql.Data.MySqlClient;
 using do_an_framework.Models;
 using BCrypt;
+using Newtonsoft.Json;
 
 namespace do_an_framework.Controllers
 {
@@ -90,12 +91,8 @@ namespace do_an_framework.Controllers
                     if (CheckLogin(email, password))
                     {
                         UserModel user = getUser(email);
-                        HttpContext.Session.SetInt32("user_id", user.user_id);
-                        HttpContext.Session.SetString("user_name", user.user_name);
-                        HttpContext.Session.SetInt32("user_type", user.user_type);
-                        HttpContext.Session.SetString("user_img", user.user_image);
-                        HttpContext.Session.SetString("user_email", email);
-                        HttpContext.Session.SetString("user_password", password);
+                        var obj = JsonConvert.SerializeObject(user);
+                        HttpContext.Session.SetString("user", obj);
                         HttpContext.Session.SetString("result", "success");
                         HttpContext.Session.SetString("message", "Đăng nhập thành công");
                         return RedirectToAction("Index","User");

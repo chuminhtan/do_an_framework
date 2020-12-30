@@ -10,7 +10,7 @@ namespace do_an_framework.Models
     {
         public int order_id { get; set; }
         public string customer_name { get; set; }
-        public int customer_phone { get; set; }
+        public string customer_phone { get; set; }
         public string address { get; set; }
         public DateTime delivery_time { get; set; }
         public string customer_note { get; set; }

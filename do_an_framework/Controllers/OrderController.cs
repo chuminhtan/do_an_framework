@@ -92,7 +92,7 @@ namespace do_an_framework.Controllers
                 {
                     order.order_id = reader.GetInt32(0);
                     order.customer_name = reader.GetString(1);
-                    order.customer_phone = reader.GetInt32(2);
+                    order.customer_phone = reader.GetInt32(2).ToString();
                     order.address = reader.GetString(3);
                     order.delivery_time = reader.GetDateTime(4);
                     order.customer_note = reader.GetString(5);
