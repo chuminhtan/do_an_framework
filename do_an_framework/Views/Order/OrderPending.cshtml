@@ -5,6 +5,13 @@
     List<CategoryModel> categoryList = ViewBag.Categories;
 }
 <!-- Page Body -->
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <div class="d-sm-flex align-items-center justify-content-between">
+        <h1 class="h3 mb-0 text-primary font-weight-bold mr-5">Đơn Hàng Số #@order.order_id</h1>
+        <span class="text-white bg-warning p-1">Chờ Xác Nhận</span>
+    </div>
+</div>
+
 <div class="row">
     <!-- Cột Bên Trái-->
     <div class="col-md-8">
@@ -13,7 +20,7 @@
         <div class="card mb-3">
             <div class="card-body">
                 <h5 class="text-center font-weight-bold mb-3">Giỏ Hàng</h5>
-                <form asp-action="Update" asp-controller="OrderDetail" method="POST">
+                <form action="/admin/order/updateOrderDetail" method="POST">
                     <table class="table table-striped table-hover">
                         <thead>
                             <tr>
@@ -41,17 +48,16 @@
                                             <td>@number</td>
                                             <td>
                                                 @detail.order_id
-                                                <input type="number" class="id_list" name="product_id_list[]" hidden
-                                                       value="@detail.product_id">
+                                                <input type="number" class="id_list" name="product_id_list[]" hidden value="@detail.product_id">
                                             </td>
                                             <td>
-                                                <image src="/images/product/@detail.product_image" alt="img"
-                                                       width="80">
+                                                <image src="/images/product/@detail.product_image" alt="img" width="80">
                                             </td>
-                                            <td>@detail.product_name</td>
-                                            <td class="text-primary text-right" id="@detail.product_id-price"
-                                                value="@detail.price">
-                                                @detail.price
+                                            <td>
+                                                    @detail.product_name
+                                            </td>
+                                            <td class="text-primary text-right">
+                                                 <input type="number"  name="product_price_list[]" class="form-control text-right" id="@detail.product_id-price" value="@detail.price" readonly>
                                             </td>
                                             <td>
                                                 <input type="number" name="quantity_updated_list[]"
@@ -60,7 +66,7 @@
                                                        value=@detail.count onchange="changeProductQuantity(this);">
                                             </td>
                                             <td class="text-primary font-weight-bold text-right amount"
-                                                id="@detail.product_id-amount" class="text-right"
+                                                id="@detail.product_id-amount"
                                                 value="@detail.total">
                                                 @detail.total
                                             </td>
@@ -127,7 +133,7 @@
                                                             </td>
                                                             <td>
                                                                 <image id="@product.product_id-add_product_image"
-                                                                    src="~/admin/product/@product.product_image"
+                                                                    src="/images/product/@product.product_image"
                                                                     alt="img" width="80">
                                                             </td>
                                                             <td id="@product.product_id-add_product_name"
@@ -167,7 +173,7 @@
                 <h5 class="text-center font-weight-bold mb-3">Nhân Viên</h5>
 
                 <!-- Form -->
-                <form method="POST" action="">
+                <form method="POST" action="/admin/order/confirm/">
                     <input type="number" name="order_id" value="@order.order_id" hidden>
 
                     <!-- Ghi Chú -->
@@ -181,8 +187,7 @@
                         </div>
                     </div>
                     <div class="row mb-5 mt-5 d-flex justify-content-center">
-                        <a href="Ham huy"
-                           class="btn btn-danger mr-5">Hủy Đơn Hàng</a>
+                        <a href="/admin/order/cancelorder/@order.order_id" class="btn btn-danger mr-5">Hủy Đơn Hàng</a>
                         <button type="submit" class="btn btn-success">Xác Nhận Đơn Hàng</button>
                     </div>
                 </form>
@@ -237,91 +242,92 @@
         </div>
 
         <!-- Lịch Sử -->
-        <div class="card mt-3">
+ <div class="card mt-3">
             <div class="card-body">
                 <h5 class="text-center font-weight-bold mb-3">Lịch Sử</h5>
                 <textarea name="order_history" class=" form-control" rows="15" readonly>@order.history</textarea>
             </div>
         </div>
+
     </div>
     </div>
     <!-- kết thúc main-container -->
 
     <!-- Java Script -->
-    <script>
-        // Kiểm tra biến errors từ server gửi về. Nếu có lỗi xuất popup thông báo
-        /*if(count($errors) > 0)
-        Swal.fire({
-            title: 'Thất Bại',
-            text: 'Vui lòng kiểm tra lại thông tin',
-            icon: 'error',
-            confirmButtonText: 'OK'
-        })*/
-        
+<script>
+    // Kiểm tra biến errors từ server gửi về. Nếu có lỗi xuất popup thông báo
+    /*if(count($errors) > 0)
+    Swal.fire({
+        title: 'Thất Bại',
+        text: 'Vui lòng kiểm tra lại thông tin',
+        icon: 'error',
+        confirmButtonText: 'OK'
+    })*/
 
-        // Change Product Quantity
-        const changeProductQuantity = (inputQuantity) => {
-            const productId = inputQuantity.id.split("-")[0];
-            const productPrice = document.getElementById(`${productId}-price`).getAttribute('value');
-            const productQuantity = inputQuantity.value
 
-            const amount_dom = document.getElementById(`${productId}-amount`)
+    // Change Product Quantity
+    const changeProductQuantity = (inputQuantity) => {
+        const productId = inputQuantity.id.split("-")[0];
+        const productPrice = document.getElementById(`${productId}-price`).getAttribute('value');
+        const productQuantity = inputQuantity.value
 
-            let amount = parseInt(productPrice) * parseInt(productQuantity);
+        const amount_dom = document.getElementById(`${productId}-amount`)
 
-            if (isNaN(amount)) {
-                amount = 0;
+        let amount = parseInt(productPrice) * parseInt(productQuantity);
+
+        if (isNaN(amount)) {
+            amount = 0;
+        }
+        amount_dom.innerHTML = amount
+        amount_dom.setAttribute('value', amount)
+
+        getTotalAmount()
+    }
+
+    // Get total amount
+    const getTotalAmount = () => {
+        const amount_total_dom = document.querySelector('#amount_total')
+        const amount_list_dom = document.querySelectorAll('.amount');
+        const amount_list = Array.from(amount_list_dom);
+        console.log(amount_list);
+
+        let amount_total = 0;
+
+        amount_list.forEach((amount) => {
+            amount_total += parseInt(amount.getAttribute('value'))
+        })
+
+        console.log(amount_total)
+        amount_total_dom.innerHTML = amount_total
+    }
+    getTotalAmount();
+
+    // Add Product
+    const addProduct = (btnAdd) => {
+        const table_body_order_detail_dom = document.querySelector('#table_body_order_detail')
+        const product_id = btnAdd.id.split('-')[0]
+        const product_image = document.getElementById(`${product_id}-add_product_image`).src;
+        const product_name = document.getElementById(`${product_id}-add_product_name`).getAttribute('value')
+        const product_price = document.getElementById(`${product_id}-add_product_price`).getAttribute('value')
+
+        const id_list_dom = document.querySelectorAll('.id_list')
+        const id_list = Array.from(id_list_dom)
+        console.log(id_list)
+        let number = id_list.length
+        for (let i = 0; i < number; i++) {
+            console.log(id_list[i])
+            if (product_id == id_list[i].value) {
+                return
             }
-            amount_dom.innerHTML = amount
-            amount_dom.setAttribute('value', amount)
-
-            getTotalAmount()
         }
 
-        // Get total amount
-        const getTotalAmount = () => {
-            const amount_total_dom = document.querySelector('#amount_total')
-            const amount_list_dom = document.querySelectorAll('.amount');
-            const amount_list = Array.from(amount_list_dom);
-            console.log(amount_list);
 
-            let amount_total = 0;
+        console.log(product_id)
+        console.log(product_name)
+        console.log(product_price)
+        console.log(product_image)
 
-            amount_list.forEach((amount) => {
-                amount_total += parseInt(amount.getAttribute('value'))
-            })
-
-            console.log(amount_total)
-            amount_total_dom.innerHTML = amount_total
-        }
-        getTotalAmount();
-
-        // Add Product
-        const addProduct = (btnAdd) => {
-            const table_body_order_detail_dom = document.querySelector('#table_body_order_detail')
-            const product_id = btnAdd.id.split('-')[0]
-            const product_image = document.getElementById(`${product_id}-add_product_image`).src;
-            const product_name = document.getElementById(`${product_id}-add_product_name`).getAttribute('value')
-            const product_price = document.getElementById(`${product_id}-add_product_price`).getAttribute('value')
-
-            const id_list_dom = document.querySelectorAll('.id_list')
-            const id_list = Array.from(id_list_dom)
-            console.log(id_list)
-            let number = id_list.length
-            for (let i = 0; i < number; i++) {
-                console.log(id_list[i])
-                if (product_id == id_list[i].value) {
-                    return
-                }
-            }
-
-
-            console.log(product_id)
-            console.log(product_name)
-            console.log(product_price)
-            console.log(product_image)
-
-            let tr_html = ` <tr>
+        let tr_html = ` <tr>
                                 <td>%number%</td>
                                 <td>
                                     %product_id%
@@ -333,19 +339,17 @@
                                         width="80">
                                 </td>
                                 <td>%product_name%</td>
-                                <td class="text-primary text-right" id="%product_id%-price"
-                                    value="%product_price%">
-                                    %product_price%</td>
-                                <td>
-                                    <input type="number" name="quantity_updated_list[]"
-                                        id="%product_id%-quantity" min="0"
-                                        class="form-control text-center text-center font-weight-bold"
-                                        value="0" onchange="changeProductQuantity(this);">
-                                </td>
-                                <td class="text-primary font-weight-bold text-right amount"
-                                    id="%product_id%-amount" class="text-right"
-                                    value="0">0</td>
-                            </tr>`
+                                <td class="text-primary text-right"><input type="number" class="form-control text-right" name="product_price_list[]" id="%product_id%-price" value="%product_price%" readonly></td>
+                                    <td>
+                                        <input type="number" name="quantity_updated_list[]"
+                                            id="%product_id%-quantity" min="0"
+                                            class="form-control text-center text-center font-weight-bold"
+                                            value="0" onchange="changeProductQuantity(this);">
+                                    </td>
+                                    <td class="text-primary font-weight-bold text-right amount"
+                                        id="%product_id%-amount" class="text-right"
+                                        value="0">0</td>
+                                </tr>`
             tr_html = tr_html.replaceAll('%number%', ++number)
             tr_html = tr_html.replaceAll('%product_id%', product_id)
             tr_html = tr_html.replaceAll('%product_name%', product_name)
@@ -354,4 +358,4 @@
 
             table_body_order_detail_dom.insertAdjacentHTML('beforeend', tr_html)
         }
-    </script>
+</script>

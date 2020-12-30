@@ -5,6 +5,29 @@
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
     <h1 class="h3 mb-0 text-primary font-weight-bold">Đơn Hàng</h1>
+    <form action="/admin/order/search" method="GET">
+        <div class="form-row align-items-center">
+
+            <div class="col-auto">
+                <label class="sr-only" for="order_id_search">Mã Đơn Hàng</label>
+                <input type="number" name="order_id_search" class="form-control mb-2" placeholder="Mã đơn hàng">
+            </div>
+            <div class="col-auto">
+                <label class="sr-only" for="customer_name_search">Tên Khách Hàng</label>
+                <input type="text" name="customer_name_search" class="form-control mb-2" placeholder="Tên khách hàng">
+            </div>
+            <div class="col-auto">
+                <label class="sr-only" for="customer_phone_search">Điện thoại</label>
+                <input type="number" name="customer_phone_search" class="form-control mb-2" placeholder="Điện thoại">
+            </div>
+        </div>
+        <div class="form-row align-items-center">
+            <div class="col-12 d-flex justify-content-between">
+                <a href="/admin/order/index" type="submit" class="btn btn-warning mb-2">Về Mặc Định</a>
+                <button type="submit" class="btn btn-primary mb-2">Tìm Kiếm</button>
+            </div>
+        </div>
+    </form>
 </div>
 
 <!-- Page Body -->
@@ -24,6 +47,7 @@
                             <th>Ngày Đặt Hàng</th>
                             <th>Đơn Hàng</th>
                             <th>Khách Hàng</th>
+                            <th>Điện Thoại</th>
                             <th>Địa Chỉ</th>
                             <th>Ngày Giao Hàng</th>
                             <th>Tổng Tiền</th>
@@ -59,6 +83,7 @@
                                     <td class="font-weight-bold">@order.order_time</td>
                                     <td class="text-center">@order.order_id</td>
                                     <td>@order.customer_name</td>
+                                    <td class="text-right text-primary">@order.customer_phone</td>
                                     <td>@order.address</td>
                                     <td class="text-primary font-weight-bold">
                                         @order.delivery_time

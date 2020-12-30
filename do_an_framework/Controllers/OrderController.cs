@@ -17,12 +17,58 @@ namespace do_an_framework.Controllers
         {
             this.MySqlDatabase = mySqlDb;
         }
-        
 
+        /**
+ * INDEX
+ */
+        public ActionResult Index()
+        {
+            List<OrderModel> orderList = new List<OrderModel>();
+            orderList = GetOrderList();
+            return View(orderList);
+        }
+
+
+
+        /**
+         * INFO
+         */
+        [HttpGet]
+        public IActionResult Info(int id)
+        {
+
+            OrderModel order = new OrderModel();
+            order = GetInfoOrder(id);
+
+            if (order == null)
+            {
+                HttpContext.Session.SetString("result", "fail");
+                HttpContext.Session.SetString("message", "Không tồn tại hóa đơn");
+                return RedirectToAction(nameof(Index));
+            }
+
+
+                ViewBag.Order = order;
+                ViewBag.Details = GetListDetail(id);
+                ViewBag.Products = GetListProductForOrder();
+                ViewBag.Categories = GetListCategoryForOrder();
+
+            if (order.status == 1)
+            {
+                return View("Views/Order/OrderPending.cshtml");
+            }
+ 
+                return View("Views/Order/OrderConfirmed.cshtml");
+        }
+
+
+        /**
+         * GET ORDER LIST
+         */
         public List<OrderModel> GetOrderList()
         {
             List<OrderModel> orderList = new List<OrderModel>();
-            var sql = "Select ma_don_hang, ten_khach_hang, dia_chi_giao_hang, thoi_gian_giao_hang, tong_tien, tinh_trang, thoi_gian_tao from don_hang";
+            var sql = "Select ma_don_hang, ten_khach_hang, dia_chi_giao_hang, thoi_gian_giao_hang, tong_tien, tinh_trang, thoi_gian_tao, dien_thoai_khach_hang from don_hang";
             var command = new MySqlCommand(sql, MySqlDatabase.Connection);
 
             var reader = command.ExecuteReader();
@@ -39,7 +85,7 @@ namespace do_an_framework.Controllers
                     temp.total = reader.GetInt32(4);
                     temp.status = reader.GetInt32(5);
                     temp.order_time = reader.GetDateTime(6);
-
+                    temp.customer_phone = reader.GetString(7);
                     orderList.Add(temp);
                 }
             }
@@ -50,35 +96,12 @@ namespace do_an_framework.Controllers
             return orderList;
         }
 
-        public ActionResult Index()
-        {
-            List<OrderModel> orderList = new List<OrderModel>();
-            orderList = GetOrderList();
-            return View(orderList);
-        }
 
-        public IActionResult Info(int id)
-        {
 
-            OrderModel order = new OrderModel();
-            order = GetInfoOrder(id);
 
-            if (order == null)
-            {
-                HttpContext.Session.SetString("result", "fail");
-                HttpContext.Session.SetString("message", "Không tồn tại hóa đơn");
-                return RedirectToAction(nameof(Index));
-            }
-            else
-            {
-                ViewBag.Order = order;
-                ViewBag.Details = GetListDetail(id);
-                ViewBag.Products = GetListProductForOrder();
-                ViewBag.Categories = GetListCategoryForOrder();
-                return View();
-            }
-        }
-
+        /**
+         * GET ORDER
+         */
         public OrderModel GetInfoOrder(int id)
         {
             OrderModel order = new OrderModel();
@@ -99,17 +122,19 @@ namespace do_an_framework.Controllers
                     order.delivery_time = Convert.ToDateTime(reader["thoi_gian_giao_hang"]);
                     order.customer_note = reader["ghi_chu_khach_hang"].ToString();
                     order.total = Convert.ToInt32(reader["tong_tien"]);
-                    order.count = Convert.ToInt32(reader["tong_so_luong"]);                
+                    order.count = Convert.ToInt32(reader["tong_so_luong"]);
                     order.status = Convert.ToInt32(reader["tinh_trang"]);
                     order.user_note = reader["ghi_chu_nhan_vien"].ToString();
                     order.order_time = Convert.ToDateTime(reader["thoi_gian_tao"]);
-                    order.history = reader["ghi_chu_nhan_vien"].ToString();
+                    order.history = reader["lich_su"].ToString();
+
                 }
-            } else
+            }
+            else
             {
                 order = null;
             }
-               
+
             reader.Close();
             return order;
         }
@@ -117,7 +142,7 @@ namespace do_an_framework.Controllers
         public List<OrderDetailModel> GetListDetail(int id)
         {
             int orderId = id;
-           
+
             List<OrderDetailModel> detailList = new List<OrderDetailModel>();
 
             var sql = "Select chi_tiet_don_hang.*, ten_san_pham, anh_san_pham from chi_tiet_don_hang join san_pham on chi_tiet_don_hang.ma_san_pham = san_pham.ma_san_pham where ma_don_hang = @order_id";
@@ -144,7 +169,8 @@ namespace do_an_framework.Controllers
 
                     detailList.Add(temp);
                 }
-            }else
+            }
+            else
             {
                 detailList = null;
             }
@@ -159,7 +185,7 @@ namespace do_an_framework.Controllers
             List<ProductModel> productList = new List<ProductModel>();
             var sql = "Select ma_san_pham, ten_san_pham, anh_san_pham, gia, ma_danh_muc from san_pham";
             var command = new MySqlCommand(sql, MySqlDatabase.Connection);
-  
+
             var reader = command.ExecuteReader();
             if (reader.HasRows)
             {
@@ -173,7 +199,8 @@ namespace do_an_framework.Controllers
 
                     productList.Add(temp);
                 }
-            }else
+            }
+            else
             {
                 return null;
             }
@@ -286,6 +313,207 @@ namespace do_an_framework.Controllers
             else
                 return null;
             return categoriesList;
+        }
+
+        /**
+         * Update Order Detail
+         */
+
+        [HttpPost]
+        public IActionResult updateOrderDetail()
+        {
+            int orderId = Convert.ToInt32(Request.Form["order_id"]);
+
+            // lấy danh sách id sản phẩm mới
+            var productIdListStr = Request.Form["product_id_list[]"];
+            int[] productIdListArr = new int[productIdListStr.Count];
+            int i = 0;
+            foreach (var productIdStr in productIdListStr) {
+                productIdListArr[i] = Convert.ToInt32(productIdStr);
+                i++;
+            }
+
+            // lấy danh sách đơn giá
+            var productPriceListStr = Request.Form["product_price_list[]"];
+            int[] productPriceListArr = new int[productPriceListStr.Count];
+            int j = 0;
+            foreach (var productPriceStr in productPriceListStr)
+            {
+                productPriceListArr[j] = Convert.ToInt32(productPriceStr);
+                j++;
+            }
+
+            // lấy danh sách số lượng
+            var productQuantityListStr = Request.Form["quantity_updated_list[]"];
+            int[] productQuantityListArr = new int[productPriceListStr.Count];
+            int k = 0;
+            foreach (var productQuantityStr in productQuantityListStr)
+            {
+                productQuantityListArr[k] = Convert.ToInt32(productQuantityStr);
+                k++;
+            }
+
+            var sql = "DELETE FROM chi_tiet_don_hang WHERE ma_don_hang=@order_id";
+            var command = new MySqlCommand(sql, MySqlDatabase.Connection);
+            command.CommandText = sql;
+            command.Parameters.AddWithValue("@order_id", orderId);
+            
+            var result = command.ExecuteNonQuery();
+
+            // Cập nhật số lượng
+            
+            int size = productQuantityListArr.Length;
+            for (int l = 0; l < size; l++)
+            {
+                if ( productQuantityListArr[l] == 0)
+                {
+                    continue;
+                }
+
+                string queryInsert = "INSERT INTO chi_tiet_don_hang (ma_don_hang, ma_san_pham, so_luong_ban, don_gia, thanh_tien) VALUES(@order_id, @product_id, @product_quantity, @product_price, @total)";
+                
+                using (var commandInsert= new MySqlCommand(queryInsert, MySqlDatabase.Connection)) {
+                    commandInsert.Parameters.AddWithValue("@order_id", orderId);
+                    commandInsert.Parameters.AddWithValue("@product_id", productIdListArr[l]);
+                    commandInsert.Parameters.AddWithValue("@product_quantity", productQuantityListArr[l]);
+                    commandInsert.Parameters.AddWithValue("@product_price", productPriceListArr[l]);
+                    commandInsert.Parameters.AddWithValue("@total", productPriceListArr[l] * productQuantityListArr[l]);
+
+                    int resultInsert = commandInsert.ExecuteNonQuery();
+   
+                }
+             
+                
+            }
+
+            return RedirectToAction("info", new { @id = orderId });
+        }
+
+
+        /**
+         * Confirm Order
+         */
+        public IActionResult Confirm (int id)
+        {
+            int orderId = Convert.ToInt32(Request.Form["order_id"]);
+            string userNote = Request.Form["user_note"];
+            OrderModel order = GetInfoOrder(orderId);
+            string history = order.history;
+
+            history += DateTime.Now + " - " + "user #" + HttpContext.Session.GetInt32("user_id") + " : Xác nhận đơn hàng\r\n";
+            string queryUpdate = "UPDATE don_hang SET tinh_trang=2, ghi_chu_nhan_vien=@user_note, lich_su=@history WHERE ma_don_hang=@order_id";
+
+            using (var commandUpdate = new MySqlCommand(queryUpdate, MySqlDatabase.Connection))
+            {
+                commandUpdate.Parameters.AddWithValue("@order_id", orderId);
+                commandUpdate.Parameters.AddWithValue("@user_note", userNote);
+                commandUpdate.Parameters.AddWithValue("@history", history);
+                int resultInsert = commandUpdate.ExecuteNonQuery();
+
+            }
+
+            return RedirectToAction("Info", new { @id = orderId });
+        }
+
+        /**
+        * Success Order
+        */
+        [HttpPost]
+        public IActionResult Success(int id)
+        {
+            int orderId = Convert.ToInt32(Request.Form["order_id"]);
+            string userNote = Request.Form["user_note"];
+            OrderModel order = GetInfoOrder(orderId);
+            string history = order.history;
+
+            history += DateTime.Now + " - " + "user #" + HttpContext.Session.GetInt32("user_id") + " : Giao hàng thành công\r\n";
+            string queryUpdate = "UPDATE don_hang SET tinh_trang=3, ghi_chu_nhan_vien=@user_note, lich_su=@history WHERE ma_don_hang=@order_id";
+
+            using (var commandUpdate = new MySqlCommand(queryUpdate, MySqlDatabase.Connection))
+            {
+                commandUpdate.Parameters.AddWithValue("@order_id", orderId);
+                commandUpdate.Parameters.AddWithValue("@user_note", userNote);
+                commandUpdate.Parameters.AddWithValue("@history", history);
+                int resultInsert = commandUpdate.ExecuteNonQuery();
+
+            }
+            return RedirectToAction("Info", new { @id = orderId });
+        }
+
+
+        /**
+        * Cancel Order
+        */
+        [HttpGet]
+        public IActionResult CancelOrder(int id)
+        {
+            int orderId = id;
+            OrderModel order = GetInfoOrder(orderId);
+            string history = order.history;
+
+            history += DateTime.Now + " - " + "user #" + HttpContext.Session.GetInt32("user_id") + " : Hủy đơn hàng\r\n";
+           
+            string userNote = Request.Form["user_note"];
+
+            string queryUpdate = "UPDATE don_hang SET tinh_trang=0, ghi_chu_nhan_vien=@user_note, lich_su=@history WHERE ma_don_hang=@order_id";
+
+            using (var commandUpdate = new MySqlCommand(queryUpdate, MySqlDatabase.Connection))
+            {
+                commandUpdate.Parameters.AddWithValue("@order_id", orderId);
+                commandUpdate.Parameters.AddWithValue("@user_note", userNote);
+                commandUpdate.Parameters.AddWithValue("@history", history);
+                int resultInsert = commandUpdate.ExecuteNonQuery();
+
+            }
+            return RedirectToAction("Info", new { @id = orderId });
+        }
+
+        
+        /**
+         * SEARCH ORDER
+         */
+        [HttpGet]
+        public IActionResult Search(int order_id_search, string customer_name_search, string customer_phone_search) {
+
+            if (customer_name_search != null)
+            {
+                customer_name_search = customer_name_search.ToLower();
+            }
+
+            List<OrderModel> orderList = new List<OrderModel>();
+
+            var sql = "Select ma_don_hang, ten_khach_hang, dia_chi_giao_hang, thoi_gian_giao_hang, tong_tien, tinh_trang, thoi_gian_tao, dien_thoai_khach_hang  FROM don_hang WHERE ma_don_hang=@order_id_search OR LOWER(ten_khach_hang)=@customer_name_search OR dien_thoai_khach_hang=@customer_phone_search";
+
+            var command = new MySqlCommand(sql, MySqlDatabase.Connection);
+
+            command.Parameters.AddWithValue("@order_id_search", order_id_search);
+            command.Parameters.AddWithValue("@customer_name_search", customer_name_search);
+            command.Parameters.AddWithValue("@customer_phone_search", customer_phone_search);
+
+            var reader = command.ExecuteReader();
+
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    OrderModel temp = new OrderModel();
+                    temp.order_id = reader.GetInt32(0);
+                    temp.customer_name = reader.GetString(1);
+                    temp.address = reader.GetString(2);
+                    temp.delivery_time = reader.GetDateTime(3);
+                    temp.total = reader.GetInt32(4);
+                    temp.status = reader.GetInt32(5);
+                    temp.order_time = reader.GetDateTime(6);
+                    temp.customer_phone = reader.GetString(7);
+                    orderList.Add(temp);
+                }
+            }
+            else
+            {
+                orderList = null;
+            }
+
+            return View("Views/Order/index.cshtml", orderList);
         }
     }
 }

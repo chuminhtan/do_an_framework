@@ -96,7 +96,6 @@
                 cancelButtonText: 'Hủy'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    alert(btnDelete.href);
                     location.assign(btnDelete.href)
                 }
                 return false
