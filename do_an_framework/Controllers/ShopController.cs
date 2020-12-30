@@ -7,46 +7,18 @@ using MySql.Data.MySqlClient;
 using do_an_framework.Models;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
-
 namespace do_an_framework.Controllers
 {
     public class ShopController : Controller
     {
+        // số sản phẩm trên 1 trang
+        const int PAGINATION = 10;
         private MySqlDatabase MySqlDatabase { get; set; }
         public ShopController(MySqlDatabase mySqlDb)
         {
             this.MySqlDatabase = mySqlDb;
         }
-        // Lấy danh sách các danh mục
-        public List<CategoryModel> getListCategories()
-        {
-            List<CategoryModel> categories = new List<CategoryModel>();
-
-            string sql = "SELECT * FROM danh_muc";
-
-            var command = new MySqlCommand(sql, MySqlDatabase.Connection);
-
-            var reader = command.ExecuteReader();
-
-            if (reader.HasRows)
-            {
-                while (reader.Read())
-                {
-                    var id = reader.GetInt32(0);
-                    var name = reader.GetString(1);
-                    var description = reader.GetString(2);
-                    CategoryModel category = new CategoryModel(id, name, description);
-                    categories.Add(category);
-                }
-            }
-            else
-            {
-                categories = null;
-            }
-            reader.Close();
-            return categories;
-        }
-
+        
         // Lấy danh sách các sản phẩm
         public List<ProductModel> getListProducts()
         {
@@ -54,8 +26,7 @@ namespace do_an_framework.Controllers
 
             string sql = "SELECT san_pham.*, danh_muc.ten_danh_muc " +
                 "FROM san_pham INNER JOIN danh_muc " +
-                "ON san_pham.ma_danh_muc = danh_muc.ma_danh_muc " +
-                "GROUP BY san_pham.ma_danh_muc";
+                "ON san_pham.ma_danh_muc = danh_muc.ma_danh_muc";
 
             var command = new MySqlCommand(sql, MySqlDatabase.Connection);
 
@@ -93,8 +64,7 @@ namespace do_an_framework.Controllers
                                 "san_pham.ten_san_pham, san_pham.anh_san_pham, san_pham.gia " +
                          "FROM san_pham INNER JOIN danh_muc " +
                          "ON san_pham.ma_danh_muc = danh_muc.ma_danh_muc " +
-                         "WHERE danh_muc.ma_danh_muc = @madm " +
-                         "GROUP BY danh_muc.ma_danh_muc";
+                         "WHERE danh_muc.ma_danh_muc = @madm ";
             var command = new MySqlCommand(sql, MySqlDatabase.Connection);
 
             command.CommandText = sql;
@@ -158,25 +128,168 @@ namespace do_an_framework.Controllers
             reader.Close();
             return product;
         }
-        public IActionResult Category(int id)
+        // Lấy thông tin sản phẩm bằng key word
+        public List<ProductModel> getListProductByName(string keyword)
         {
+            List<ProductModel> products = new List<ProductModel>();
+            var sql = "SELECT san_pham.*, danh_muc.ten_danh_muc " +
+                "FROM san_pham INNER JOIN danh_muc " +
+                "ON san_pham.ma_danh_muc = danh_muc.ma_danh_muc " +
+                "WHERE ten_san_pham LIKE '%" + keyword + "%'";
+            var command = new MySqlCommand(sql, MySqlDatabase.Connection);
 
+            var reader = command.ExecuteReader();
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    ProductModel product = new ProductModel();
+                    product.product_id = reader.GetInt32(0);
+                    product.product_name = reader.GetString(1);
+                    product.product_description = reader.GetString(2);
+                    product.product_price = reader.GetInt32(3);
+                    product.product_state = reader.GetInt32(4);
+                    product.product_kind = reader.GetInt32(5);
+                    product.product_image = reader.GetString(6);
+                    product.category_name = reader.GetString(9);
+                    products.Add(product);
+                }
+            }
+            else
+            {
+                products = null;
+            }
+            reader.Close();
+            return products;
+        }
+        // Lấy danh sách sản phẩm theo yêu cầu phân trang dữ liệu 
+        public List<ProductModel> getListProductByPagination(int page)
+        {
+            var start = 0;
+            var finish = 0;
+            if(page > 1)
+            {
+                start = (page - 1) * PAGINATION;
+                finish = page * PAGINATION;
+            } else
+            {
+                start = 0;
+                finish = PAGINATION - 1;
+            }
+            List<ProductModel> products = new List<ProductModel>();
+            var sql = "SELECT san_pham.*, danh_muc.ten_danh_muc " +
+                "FROM san_pham INNER JOIN danh_muc " +
+                "ON san_pham.ma_danh_muc = danh_muc.ma_danh_muc " +
+                "WHERE ma_san_pham LIMIT " + start + ", " + finish ;
+            var command = new MySqlCommand(sql, MySqlDatabase.Connection);
+
+            var reader = command.ExecuteReader();
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    ProductModel product = new ProductModel();
+                    product.product_id = reader.GetInt32(0);
+                    product.product_name = reader.GetString(1);
+                    product.product_description = reader.GetString(2);
+                    product.product_price = reader.GetInt32(3);
+                    product.product_state = reader.GetInt32(4);
+                    product.product_kind = reader.GetInt32(5);
+                    product.product_image = reader.GetString(6);
+                    product.category_name = reader.GetString(9);
+                    products.Add(product);
+                }
+            }
+            else
+            {
+                products = null;
+            }
+            reader.Close();
+            return products;
+        }
+        // Danh sách sản phẩm theo loại và phân trang theo yêu cầu
+        public List<ProductModel> getListProductByPaginationAndCategory(int page, int id)
+        {
+            var start = 0;
+            var finish = 0;
+            if (page > 1)
+            {
+                start = (page - 1) * PAGINATION;
+                finish = page * PAGINATION;
+            }
+            else
+            {
+                start = 0;
+                finish = PAGINATION - 1;
+            }
+            List<ProductModel> products = new List<ProductModel>();
+            var sql = "SELECT san_pham.*, danh_muc.ten_danh_muc " +
+                "FROM san_pham INNER JOIN danh_muc " +
+                "ON san_pham.ma_danh_muc = danh_muc.ma_danh_muc " +
+                "WHERE danh_muc.ma_danh_muc = @category ORDER BY ma_san_pham LIMIT @start, @finish";
+            var command = new MySqlCommand(sql, MySqlDatabase.Connection);
+            command.CommandText = sql;
+            command.Parameters.AddWithValue("category", id);
+            command.Parameters.AddWithValue("start", start);
+            command.Parameters.AddWithValue("finish", finish);
+
+            var reader = command.ExecuteReader();
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    ProductModel product = new ProductModel();
+                    product.product_id = reader.GetInt32(0);
+                    product.product_name = reader.GetString(1);
+                    product.product_description = reader.GetString(2);
+                    product.product_price = reader.GetInt32(3);
+                    product.product_state = reader.GetInt32(4);
+                    product.product_kind = reader.GetInt32(5);
+                    product.product_image = reader.GetString(6);
+                    product.category_name = reader.GetString(9);
+                    products.Add(product);
+                }
+            }
+            else
+            {
+                products = null;
+            }
+            reader.Close();
+            return products;
+        }
+
+        public IActionResult Category(int id, int page = 1)
+        {
             List<ProductModel> products = new List<ProductModel>();
             products = getListProductGroupByCategory(id);
             var category_name = products[0].category_name;
             ViewData["category_name"] = category_name;
+            ViewData["category_id"] = id;
+            if(products.Count > PAGINATION)
+            {
+                ViewData["pages"] = products.Count/PAGINATION + 1;
+            }
+            else
+            {
+                ViewData["pages"] = 1;
+            }
+            products = getListProductByPaginationAndCategory(page, id);
             return View(products);
         }
 
-        public IActionResult List()
+        public IActionResult List(int page = 1)
         {
-            var categories = getListCategories();
-            var obj = JsonConvert.SerializeObject(categories);
-            HttpContext.Session.SetString("category", obj);
             List<ProductModel> products = new List<ProductModel>();
             products = getListProducts();
-            obj = JsonConvert.SerializeObject(products);
-            HttpContext.Session.SetString("products", obj);
+            if (products.Count > PAGINATION)
+            {
+                ViewData["pages"] = products.Count / PAGINATION + 1;
+            }
+            else
+            {
+                ViewData["pages"] = 1;
+            }
+            products = getListProductByPagination(page);
             return View(products);
         }
 
@@ -184,17 +297,25 @@ namespace do_an_framework.Controllers
         {
             ProductModel product = new ProductModel();
             product = getProductById(id);
+            ViewBag.products = getListProducts();
             return View(product);
         }
 
-        public IActionResult Search()
+        public IActionResult Search(string product_name, int page)
         {
-            return View();
-        }
-
-        public IActionResult ShopDetail()
-        {
-            return View();
+            List<ProductModel> products = new List<ProductModel>();
+            products = getListProductByName(product_name);
+            ViewData["key_word"] = product_name;
+            if (products.Count > PAGINATION)
+            {
+                ViewData["pages"] = products.Count / PAGINATION + 1;
+            }
+            else
+            {
+                ViewData["pages"] = 1;
+            }
+            products = getListProductByPagination(page);
+            return View(products);
         }
     }
 }

@@ -1,9 +1,9 @@
 ﻿<!-- Khai báo sử dụng layout store -->
-@{ 
+@{
     Layout = "_StoreLayout";
     var category_name = ViewData["category_name"];
+    var category_id = ViewData["category_id"];
 }
-
 <!-- Khai báo định nghĩa phần main-container trong layout store-->
 <!-- Main Content Begin -->
 <div id="main-content">
@@ -36,7 +36,7 @@
                     <div class="col-lg-3 col-md-6 col-sm-6">
                         <div class="product__item">
                             <div class="product__item__pic set-bg"
-                                 data-setbg="/image/product/@product.product_image"
+                                 data-setbg="/images/product/@product.product_image"
                                  style="background-image: url('/images/product/@product.product_image') ">
                                 <div class="product__label">
                                     <span>@product.category_name</span>
@@ -44,11 +44,11 @@
                             </div>
                             <div class="product__item__text">
                                 <h6>
-                                    <a href="product/@product.product_id">@product.product_name</a>
+                                    <a href="/shop/product/@product.product_id">@product.product_name</a>
                                 </h6>
-                                <div class="product__item__price">@(Convert.ToDecimal(product.prodoct_price).ToString("#,##0"))</div>
+                                <div class="product__item__price">@(Convert.ToDecimal(product.product_price).ToString("#,##0"))</div>
                                 <div class="cart_add">
-                                    <a href="checkout/add-cart/@product.product_id">Thêm Giỏ Hàng</a>
+                                    <a href="/store/cart/@product.product_id">Thêm Giỏ Hàng</a>
                                 </div>
                             </div>
                         </div>
@@ -58,12 +58,34 @@
             <div class="shop__last__option">
                 <div class="row">
                     <div class="col-lg-6 col-md-6 col-sm-6">
-                        <!--Phân trang tại đây-->
                     </div>
                     <div class="col-lg-6 col-md-6 col-sm-6">
                     </div>
                 </div>
             </div>
+            <!-- Phân trang-->
+            <nav aria-label="Page navigation example">
+                <ul class="pagination">
+                    @{
+                        var pages = (int)ViewData["pages"];
+                        if (pages > 1)
+                        {
+                            for (int i = 1; i <= pages; i++)
+                            {
+                                var parms = new Dictionary<string, string>
+                                {
+                                    { "page",i.ToString()},
+                                    { "id", category_id.ToString()}
+                                };
+
+                                <li class="page-item">
+                                    <a asp-controller="Shop" asp-action="Category" asp-all-route-data="parms">@i</a>
+                                </li>
+                            }
+                        }
+                    }
+                </ul>
+            </nav>
         </div>
     </section>
     <!-- Shop Section End -->

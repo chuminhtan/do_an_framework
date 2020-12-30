@@ -2,13 +2,6 @@
 @{
     Layout = "_StoreLayout";
 }
-@using Microsoft.AspNetCore.Http
-@using Newtonsoft.Json;
-@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
-@{
-    string obj = HttpContextAccessor.HttpContext.Session.GetString("products");
-    var products = JsonConvert.DeserializeObject<List<ProductModel>>(obj);
-}
 <!-- Khai báo định nghĩa phần main-container trong layout store-->
     <!-- Breadcrumb Begin -->
     <div class="breadcrumb-option">
@@ -37,7 +30,7 @@
                 <div class="col-lg-6">
                     <div class="product__details__img">
                         <div class="product__details__big__img">
-                            <img class="big_img" src="/images/product/@Model.product_image" alt="">
+                            <img class="big_img" src="~/images/product/@Model.product_image" alt="">
                         </div>
                     </div>
                 </div>
@@ -45,11 +38,11 @@
                     <div class="product__details__text">
                         <div class="product__label">@Model.category_name</div>
                         <h4>@Model.product_name</h4>
-                        <h5>@(Convert.ToDecimal(Model.prodoct_price).ToString("#,##0"))</h5>
-                        <div>
-                            
-                        </div>
-                        <form action="Store/checkout/add-cart" method="POST">
+                        <h5>@(Convert.ToDecimal(Model.product_price).ToString("#,##0"))</h5>
+                        @{
+                            <div>@Model.product_description</div>
+                        }
+                        <form action="/Store/cart" method="POST">
                             <input type="number" name="product_id" value="@Model.product_id" hidden>
                             <div class="product__details__option">
                                 <div class="quantity">
@@ -77,7 +70,7 @@
             </div>
             <div class="row">
                 <div class="related__products__slider owl-carousel">
-                    @foreach (var product in products)
+                    @foreach (var product in ViewBag.products)
                     {
                         <div class="col-lg-3">
                             <div class="product__item">
@@ -93,7 +86,7 @@
                                     </h6>
                                     <div class="product__item__price">@(Convert.ToDecimal(product.product_price).ToString("#,##0"))</div>
                                     <div class="cart_add">
-                                        <a href="/checkout/add-cart/@product.product_id">Thêm Giỏ Hàng</a>
+                                        <a href="/store/checkout/add-cart/@product.product_id">Thêm Giỏ Hàng</a>
                                     </div>
                                 </div>
                             </div>

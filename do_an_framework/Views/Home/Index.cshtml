@@ -1,8 +1,102 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿<!-- Khai báo sử dụng layout store -->
+@{ 
+    Layout = "_StoreLayout";
 }
-
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<!-- Khai báo định nghĩa phần main-container trong layout store-->
+<div id="main-content">
+    <!-- Main Content Begin -->
+    <!-- Hero Section Begin -->
+    <section class="hero">
+        <div class="hero__slider owl-carousel">
+            <div class="hero__item set-bg" data-setbg="~/store-assets/img/hero.jpg"
+                 style="background-image: url('/store-assets/img/hero.jpg')">
+                <div class="container">
+                    <div class="row d-flex justify-content-center">
+                        <div class="col-lg-8">
+                            <div class="hero__text">
+                                <h2>Hãy làm cho cuộc sống của bạn ngọt ngào hơn từng miếng một!</h2>
+                                <a href="/shop/" class="primary-btn">Khám phá</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="hero__item set-bg" data-setbg="~/store-assets/img/banner_1.jpg"
+                 style="background-image: url('/store-assets/img/banner_1.jpg')">
+                <div class="container">
+                    <div class="row d-flex justify-content-center">
+                        <div class="col-lg-8">
+                            <div class="hero__text">
+                                <h2>Giải tỏa mọi căng thẳng bằng những thức uống yêu thích!</h2>
+                                <a href="#" class="primary-btn">Click Ngay</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Hero Section End -->
+    <!-- About Section Begin -->
+    <section class="about spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 col-md-6">
+                    <div class="about__text">
+                        <div class="section-title">
+                            <span>Về 3Gs House</span>
+                            <h2>Vị ngọt cho một ngày mới!</h2>
+                        </div>
+                        <p>
+                            Ngôi nhà nhỏ "3Gs House" được thành lập từ những cô gái nhỏ có niềm đam mê to lớn với những
+                            chiếc bánh ngọt ngào. Hãy đến với cửa hàng để bắt đầu một ngày đẹp của bạn.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-6">
+                    <img src="~/store-assets/img/image_about.jpg">
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- About Section End -->
+    <!-- Product Section Begin -->
+    <section class="product spad">
+        <div class="container">
+            <div class="section-title">
+                <span>Sản phẩm nổi bật</span>
+            </div>
+            <div class="row">
+                <!-- 1 sản phẩm -->
+                @if (Model != null)
+                {
+                    @foreach (var product in Model)
+                    {
+                        <div class="col-lg-3 col-md-6 col-sm-6">
+                            <div class="product__item">
+                                <div class="product__item__pic set-bg"
+                                     data-setbg="/images/product/@product.product_id"
+                                     style="background-image: url('/images/product/@product.product_image')">
+                                    <div class="product__label">
+                                        <span>@product.category_name</span>
+                                    </div>
+                                </div>
+                                <div class="product__item__text">
+                                    <h6>
+                                        <a href="/shop/product/@product.product_id">@product.product_name</a>
+                                    </h6>
+                                    <div class="product__item__price">@(Convert.ToDecimal(product.product_price).ToString("#,##0"))</div>
+                                    <div class="cart_add">
+                                        <a href="store/cart/@product.product_id">Thêm Giỏ Hàng</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </section>
+    <!-- Product Section End -->
 </div>
+    <!-- Main Content End -->

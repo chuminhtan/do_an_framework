@@ -4,9 +4,20 @@
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
 @{
     var total = 0;
-    var quantity = 0;
+    var quantities = 0;
     string obj = HttpContextAccessor.HttpContext.Session.GetString("category");
     var categories = JsonConvert.DeserializeObject<List<CategoryModel>>(obj);
+    if (HttpContextAccessor.HttpContext.Session.GetString("cart") != null)
+    {
+        var cartobject = HttpContextAccessor.HttpContext.Session.GetString("cart");
+        var cart = JsonConvert.DeserializeObject<List<CartModel>>(cartobject);
+        foreach(var product in cart)
+        {
+            total += product.product_price * product.quantity;
+            quantities += product.quantity;
+        }
+    }
+
 }
 <!-- Header Section Begin -->
 <header class="header">
@@ -18,9 +29,9 @@
                         <div class="header__top__left">
                             <a href="/"><img src="~/store-assets/img/logo.png" alt=""></a>
                         </div>
-                        <form action="shop/search"
+                        <form action="/shop/search"
                               class="header__search d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100"
-                              method="post">
+                              method="get">
                             <div class="input-group">
                                 <input type="text" name="product_name" class="form-control bg-light border-0 small"
                                        placeholder="Nhập tên sản phẩm ...">
@@ -29,14 +40,14 @@
                         </form>
                         <div class="header__top__right">
                             <div class="header__top__right__cart">
-                                <a href="checkout/cart" class="btn btn-link">
+                                <a href="/store/list" class="btn btn-link">
                                     <i class="fa fa-shopping-basket fa-2x" style="color: black;"></i>
-                                    <span class="badge-pill badge-danger">@quantity</span>
+                                    <span class="badge-pill badge-danger">@quantities</span>
                                 </a>
                                 <div class="cart__price">
                                     Giỏ Hàng:
                                     <span style="color: #f08632;">
-                                        
+                                        @(Convert.ToDecimal(total).ToString("#,##0"))
                                     </span>
                                 </div>
                             </div>

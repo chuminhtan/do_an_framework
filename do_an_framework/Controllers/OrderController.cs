@@ -127,7 +127,6 @@ namespace do_an_framework.Controllers
                     order.user_note = reader["ghi_chu_nhan_vien"].ToString();
                     order.order_time = Convert.ToDateTime(reader["thoi_gian_tao"]);
                     order.history = reader["lich_su"].ToString();
-
                 }
             }
             else
