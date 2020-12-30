@@ -2,3 +2,4 @@
 /do_an_framework/bin
 /do_an_framework/obj
 /do_an_framework/*.user
+/do_an_framework/do_an_framework.csproj.user
